@@ -1,9 +1,9 @@
 package main;
 
-import tasktracker.Epic;
-import tasktracker.Status;
-import tasktracker.Subtask;
-import tasktracker.Task;
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
