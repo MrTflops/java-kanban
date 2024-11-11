@@ -101,19 +101,19 @@ public class TaskManager {
             return;
         }
 
-        boolean allDone = true;
+        boolean allTasksDone = true;
         boolean allNew = true;
 
         for (Subtask subtask : epicSubtasks) {
             if (subtask.getStatus() != Status.DONE) {
-                allDone = false;
+                allTasksDone = false;
             }
             if (subtask.getStatus() != Status.NEW) {
                 allNew = false;
             }
         }
 
-        if (allDone) {
+        if (allTasksDone) {
             epic.setStatus(Status.DONE);
         } else if (allNew) {
             epic.setStatus(Status.NEW);
