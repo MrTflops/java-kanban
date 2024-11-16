@@ -13,6 +13,9 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Subtask> subtasks = new HashMap<>(); // Подзадачи
     private final List<Task> history = new ArrayList<>();           // История просмотров
 
+    boolean allTasksDone = true;
+    boolean allNewTasks = true;
+
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
@@ -118,21 +121,18 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        boolean allDone = true;
-        boolean allNew = true;
-
         for (Subtask subtask : epicSubtasks) {
             if (subtask.getStatus() != Status.DONE) {
-                allDone = false;
+                allTasksDone = false;
             }
             if (subtask.getStatus() != Status.NEW) {
-                allNew = false;
+                allNewTasks = false;
             }
         }
 
-        if (allDone) {
+        if (allTasksDone) {
             epic.setStatus(Status.DONE);
-        } else if (allNew) {
+        } else if (allNewTasks) {
             epic.setStatus(Status.NEW);
         } else {
             epic.setStatus(Status.IN_PROGRESS);
