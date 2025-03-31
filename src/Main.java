@@ -7,7 +7,6 @@ import model.Task;
 
 public class Main {
     public static void main(String[] args) {
-        // Используем утилитарный класс Managers для получения менеджера задач
         TaskManager manager = Managers.getDefault();
 
         // Создание задач
