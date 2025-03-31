@@ -4,55 +4,38 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
-
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks = new HashMap<>();       // Задачи
-    private final Map<Integer, Epic> epics = new HashMap<>();       // Эпики
-    private final Map<Integer, Subtask> subtasks = new HashMap<>(); // Подзадачи
-    private final List<Task> history = new ArrayList<>();           // История просмотров
-
-    boolean allTasksDone = true;
-    boolean allNewTasks = true;
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Subtask> subtasks = new HashMap<>();
+    private final HistoryManager historyManager = new InMemoryHistoryManager();
 
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
-            addToHistory(task);
-        }
+        if (task != null) historyManager.add(task);
         return task;
     }
 
     @Override
     public Epic getEpic(int id) {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            addToHistory(epic);
-        }
+        if (epic != null) historyManager.add(epic);
         return epic;
     }
 
     @Override
     public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            addToHistory(subtask);
-        }
+        if (subtask != null) historyManager.add(subtask);
         return subtask;
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
-    }
-
-    private void addToHistory(Task task) {
-        if (history.size() >= 10) {
-            history.remove(0);
-        }
-        history.add(task);
+        return historyManager.getHistory();
     }
 
     @Override
@@ -77,6 +60,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(int id) {
+        historyManager.remove(id);
+
         if (tasks.containsKey(id)) {
             tasks.remove(id);
         } else if (epics.containsKey(id)) {
@@ -84,6 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (epic != null) {
                 for (int subtaskId : epic.getSubtaskIds()) {
                     subtasks.remove(subtaskId);
+                    historyManager.remove(subtaskId);
                 }
             }
         } else if (subtasks.containsKey(id)) {
@@ -112,6 +98,8 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.clear();
         epics.clear();
         subtasks.clear();
+        historyManager.getHistory().forEach(task ->
+                historyManager.remove(task.getId()));
     }
 
     private void updateEpicStatus(Epic epic) {
@@ -121,25 +109,24 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
+        boolean allDone = true;
+        boolean allNew = true;
+
         for (Subtask subtask : epicSubtasks) {
-            if (subtask.getStatus() != Status.DONE) {
-                allTasksDone = false;
-            }
-            if (subtask.getStatus() != Status.NEW) {
-                allNewTasks = false;
-            }
+            if (subtask.getStatus() != Status.DONE) allDone = false;
+            if (subtask.getStatus() != Status.NEW) allNew = false;
         }
 
-        if (allTasksDone) {
+        if (allDone) {
             epic.setStatus(Status.DONE);
-        } else if (allNewTasks) {
+        } else if (allNew) {
             epic.setStatus(Status.NEW);
         } else {
             epic.setStatus(Status.IN_PROGRESS);
         }
     }
 
-    public List<Subtask> getSubtasksOfEpic(int epicId) {
+    private List<Subtask> getSubtasksOfEpic(int epicId) {
         List<Subtask> subtaskList = new ArrayList<>();
         Epic epic = epics.get(epicId);
         if (epic != null) {
