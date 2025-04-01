@@ -1,82 +1,59 @@
 package model;
 
-
 import java.util.Objects;
 
 public class Task {
-    protected String nameTask;
-    protected String descriptionTask;
-    protected TaskStatus statusOfTask;
-    protected int id = 0;
+    private static int idCounter = 1;
+    private final int id;
+    private String title;
+    private String description;
+    private Status status;
 
-    public Task(String nameTask, String descriptionTask, TaskStatus statusOfTask) {
-        this.nameTask = nameTask;
-        this.descriptionTask = descriptionTask;
-        this.statusOfTask = statusOfTask;
-    }
-
-    public Task(String nameTask, String descriptionTask) {
-        this.nameTask = nameTask;
-        this.descriptionTask = descriptionTask;
-        this.statusOfTask = TaskStatus.NEW;
-    }
-
-    public String getNameTask() {
-        return nameTask;
-    }
-
-    public void setNameTask(String nameTask) {
-        this.nameTask = nameTask;
-    }
-
-    public String getDescriptionTask() {
-        return descriptionTask;
-    }
-
-    public void setDescriptionTask(String descriptionTask) {
-        this.descriptionTask = descriptionTask;
-    }
-
-    public TaskStatus getStatusOfTask() {
-        return statusOfTask;
-    }
-
-    public void setStatusOfTask(TaskStatus statusOfTask) {
-        this.statusOfTask = statusOfTask;
+    public Task(String title, String description, Status status) {
+        this.id = idCounter++;
+        this.title = title;
+        this.description = description;
+        this.status = status;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getTitle() {
+        return title;
     }
 
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName()
-                + "{ nameTask='" + nameTask
-                + "', descriptionTask ='" + descriptionTask
-                + "', statusOfTask='" + statusOfTask
-                + "', id=" + id
-                + '}';
+    public String getDescription() {
+        return description;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Task)) return false;
         Task task = (Task) o;
         return id == task.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id);
     }
-
-
 }
