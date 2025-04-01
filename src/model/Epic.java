@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private final List<Integer> subtaskIds = new ArrayList<>();
+    private final List<Integer> subtaskIds;
 
     public Epic(String title, String description) {
         super(title, description, Status.NEW);
+        this.subtaskIds = new ArrayList<>();
     }
 
     public List<Integer> getSubtaskIds() {
@@ -20,5 +21,10 @@ public class Epic extends Task {
 
     public void removeSubtaskId(int subtaskId) {
         subtaskIds.remove((Integer) subtaskId);
+    }
+
+    @Override
+    public void setId(int id) {
+        super.setId(id);
     }
 }
