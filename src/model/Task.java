@@ -1,10 +1,11 @@
 package model;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 public class Task {
     private static int idCounter = 1;
-    private final int id;
+    private final int id;  // id изменяется через рефлексию
     private String title;
     private String description;
     private Status status;
@@ -20,24 +21,35 @@ public class Task {
         return id;
     }
 
+    public void setId(int id) {
+        //рефлексируем
+        try {
+            Field field = Task.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.setInt(this, id);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public String getTitle() {
         return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public void setStatus(Status status) {
