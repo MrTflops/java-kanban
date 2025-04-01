@@ -14,17 +14,12 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = new InMemoryHistoryManager();
 
     @Override
-    public Task getTask(int id, boolean addToHistory) {  // Новый параметр для контроля добавления в историю
+    public Task getTask(int id, boolean addToHistory) {
         Task task = tasks.get(id);
         if (task != null && addToHistory) {
             historyManager.add(task);
         }
         return task;
-    }
-
-    @Override
-    public Task getTask(int id) {  // Версия с одним параметром
-        return getTask(id, true);  // По умолчанию добавляем в историю
     }
 
     @Override
@@ -45,6 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
         return subtask;
     }
 
+    // Остальные методы остаются без изменений
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();

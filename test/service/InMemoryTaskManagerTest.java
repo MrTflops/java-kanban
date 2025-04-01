@@ -1,3 +1,5 @@
+package test.service;
+
 import main.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
@@ -21,7 +23,7 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epic);
         manager.addSubtask(subtask);
 
-        assertEquals(task, manager.getTask(task.getId()));
+        assertEquals(task, manager.getTask(task.getId())); // Теперь используем версию с одним параметром
         assertEquals(epic, manager.getEpic(epic.getId()));
         assertEquals(subtask, manager.getSubtask(subtask.getId()));
     }
@@ -32,8 +34,7 @@ class InMemoryTaskManagerTest {
 
         Task task1 = new Task("Task 1", "Description 1", Status.NEW);
         Task task2 = new Task("Task 2", "Description 2", Status.NEW);
-
-        task2.setId(100); // Устанавливаем кастомный ID
+        task2.setId(100);
 
         manager.addTask(task1);
         manager.addTask(task2);
