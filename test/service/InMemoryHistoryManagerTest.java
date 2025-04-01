@@ -11,7 +11,7 @@ class InMemoryHistoryManagerTest {
     private InMemoryHistoryManager historyManager;
 
     @Test
-    void add_shouldAddTaskToHistory() {
+    void addTask() {
         historyManager = new InMemoryHistoryManager();
         Task task = new Task("Test", "Description", Status.NEW);
 
@@ -22,7 +22,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void add_duplicateTask_shouldMoveToEnd() {
+    void addDuplicateMovesToEnd() {
         historyManager = new InMemoryHistoryManager();
         Task task1 = new Task("Task 1", "Desc 1", Status.NEW);
         Task task2 = new Task("Task 2", "Desc 2", Status.IN_PROGRESS);
@@ -37,7 +37,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void remove_shouldDeleteTaskFromHistory() {
+    void removeTask() {
         historyManager = new InMemoryHistoryManager();
         Task task = new Task("To remove", "Desc", Status.DONE);
         task.setId(1);
@@ -49,7 +49,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void getHistory_shouldReturnCorrectOrder() {
+    void getHistoryOrder() {
         historyManager = new InMemoryHistoryManager();
         Task task1 = new Task("First", "1", Status.NEW);
         Task task2 = new Task("Second", "2", Status.NEW);
@@ -66,7 +66,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void taskHistory_shouldUpdateTaskVersion() {
+    void updateTaskInHistory() {
         historyManager = new InMemoryHistoryManager();
         Task task = new Task("Task", "Description", Status.NEW);
         task.setId(1);

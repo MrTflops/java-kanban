@@ -29,7 +29,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getTask_shouldReturnTaskAndAddToHistory() {
+    void getTaskAddsToHistory() {
         Task result = manager.getTask(task.getId());
 
         assertNotNull(result);
@@ -38,7 +38,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getTask_withAddToHistoryFalse_shouldNotAddToHistory() {
+    void getTaskWithoutHistory() {
         Task result = manager.getTask(task.getId(), false);
 
         assertNotNull(result);
@@ -47,7 +47,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getEpic_shouldReturnEpicAndAddToHistory() {
+    void getEpicAddsToHistory() {
         Epic result = manager.getEpic(epic.getId());
 
         assertNotNull(result);
@@ -56,7 +56,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void getSubtask_shouldReturnSubtaskAndAddToHistory() {
+    void getSubtaskAddsToHistory() {
         Subtask result = manager.getSubtask(subtask.getId());
 
         assertNotNull(result);
@@ -65,7 +65,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void tasksWithDifferentIds_shouldNotConflict() {
+    void tasksWithCustomIds() {
         Task task1 = new Task("Task 1", "Description 1", Status.NEW);
         Task task2 = new Task("Task 2", "Description 2", Status.NEW);
         task2.setId(100); // Устанавливаем кастомный ID
@@ -79,7 +79,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addedTask_shouldKeepImmutability() {
+    void taskRemainsUnchanged() {
         Task originalTask = new Task("Original", "Original Desc", Status.NEW);
         manager.addTask(originalTask);
 
