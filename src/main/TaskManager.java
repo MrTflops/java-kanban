@@ -10,6 +10,8 @@ public interface TaskManager {
 
     Task getTask(int id, boolean addToHistory);  // Новый параметр для контроля добавления в историю
 
+    Task getTask(int id);  // Версия по умолчанию (добавляет в историю)
+    
     Epic getEpic(int id);
 
     Subtask getSubtask(int id);
