@@ -21,7 +21,7 @@ public class Task {
         return id;
     }
 
-    // ✅ Метод для установки ID
+    // Метод для установки ID
     public void setId(int id) {
         this.id = id;
     }
