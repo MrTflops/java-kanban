@@ -7,14 +7,11 @@ import model.Subtask;
 import java.util.List;
 
 public interface TaskManager {
-    // Основной метод с контролем истории
+    // Основной метод
+    Task getTask(int id);
+
+    // Версия с контролем истории (если нужно)
     Task getTask(int id, boolean addToHistory);
-
-    // Перегруженный метод для удобства (добавляет в историю по умолчанию)
-    default Task getTask(int id) {
-
-        return getTask(id, true);
-    }
 
     Epic getEpic(int id);
 
