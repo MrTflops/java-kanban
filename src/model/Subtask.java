@@ -1,7 +1,5 @@
 package model;
 
-import java.lang.reflect.Field;
-
 public class Subtask extends Task {
     private final int epicId;
 
@@ -14,14 +12,8 @@ public class Subtask extends Task {
         return epicId;
     }
 
-    // рефлексируем
+    //Метод для установки ID
     public void setId(int id) {
-        try {
-            Field field = Task.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.setInt(this, id);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        super.setId(id);
     }
 }
