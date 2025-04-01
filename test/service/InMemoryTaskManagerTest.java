@@ -1,45 +1,36 @@
-import main.InMemoryHistoryManager;
-import model.Status;
+package service;
+
+import main.InMemoryTaskManager;
 import model.Task;
+import model.Status;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryHistoryManagerTest {
+public class InMemoryTaskManagerTest {
 
-    @Test
-    void testAddAndRetrieveHistory() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    private InMemoryTaskManager taskManager;
 
-        Task task1 = new Task("Task 1", "Description 1", Status.NEW);
-        Task task2 = new Task("Task 2", "Description 2", Status.IN_PROGRESS);
-
-        historyManager.add(task1);
-        historyManager.add(task2);
-
-        assertEquals(2, historyManager.getHistory().size());
-        assertEquals(task1, historyManager.getHistory().get(0));
-        assertEquals(task2, historyManager.getHistory().get(1));
+    @BeforeEach
+    public void setUp() {
+        taskManager = new InMemoryTaskManager();
     }
 
     @Test
-    void testDuplicateRemoval() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-
+    public void testAddTask() {
         Task task = new Task("Task 1", "Description", Status.NEW);
-        historyManager.add(task);
-        historyManager.add(task);
+        taskManager.addTask(task);
 
-        assertEquals(1, historyManager.getHistory().size());
+        assertEquals(1, taskManager.getAllTasks().size());
+        assertEquals(task, taskManager.getAllTasks().get(0));
     }
 
     @Test
-    void testRemoveFromHistory() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    public void testDeleteTaskById() {
+        Task task = new Task("Task 1", "Description", Status.NEW);
+        taskManager.addTask(task);
+        taskManager.deleteTaskById(task.getId());
 
-        Task task = new Task("Task", "Description", Status.NEW);
-        historyManager.add(task);
-        historyManager.remove(task.getId());
-
-        assertEquals(0, historyManager.getHistory().size());
+        assertTrue(taskManager.getAllTasks().isEmpty());
     }
 }
