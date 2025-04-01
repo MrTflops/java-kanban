@@ -7,17 +7,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest {
 
-    private InMemoryTaskManager taskManager;
+    InMemoryTaskManager taskManager;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         taskManager = new InMemoryTaskManager();
     }
 
     @Test
-    public void testAddTask() {
+    void testAddTask() {
         Task task = new Task("Task 1", "Description", Status.NEW);
         taskManager.addTask(task);
 
@@ -26,7 +26,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void testDeleteTaskById() {
+    void testDeleteTaskById() {
         Task task = new Task("Task 1", "Description", Status.NEW);
         taskManager.addTask(task);
         taskManager.deleteTaskById(task.getId());
