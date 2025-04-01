@@ -66,7 +66,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void taskHistory_shouldPreservePreviousVersion() {
+    void taskHistory_shouldUpdateTaskVersion() {
         historyManager = new InMemoryHistoryManager();
         Task task = new Task("Task", "Description", Status.NEW);
         task.setId(1);
@@ -74,12 +74,12 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task);
 
         Task updatedTask = new Task("Updated", "New Desc", Status.DONE);
-        updatedTask.setId(1);
+        updatedTask.setId(1); // Тот же ID
 
         historyManager.add(updatedTask);
 
         assertEquals(1, historyManager.getHistory().size());
-        assertNotEquals(task, historyManager.getHistory().get(0));
-        assertEquals(updatedTask, historyManager.getHistory().get(0));
+        assertEquals("Updated", historyManager.getHistory().get(0).getTitle()); // Проверяем обновлённые поля
+        assertEquals(Status.DONE, historyManager.getHistory().get(0).getStatus());
     }
 }
