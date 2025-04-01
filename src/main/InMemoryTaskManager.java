@@ -14,9 +14,9 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = new InMemoryHistoryManager();
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id, boolean addToHistory) {  // Новый параметр для контроля добавления в историю
         Task task = tasks.get(id);
-        if (task != null) {
+        if (task != null && addToHistory) {
             historyManager.add(task);
         }
         return task;

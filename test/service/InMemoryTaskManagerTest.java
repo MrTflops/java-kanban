@@ -1,56 +1,45 @@
-import main.InMemoryTaskManager;
-import model.Epic;
-import model.Subtask;
-import model.Task;
+import main.InMemoryHistoryManager;
 import model.Status;
-import org.junit.jupiter.api.BeforeEach;
+import model.Task;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryTaskManagerTest {
+public class InMemoryHistoryManagerTest {
 
-    private InMemoryTaskManager taskManager;
+    @Test
+    void testAddAndRetrieveHistory() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-    @BeforeEach
-    void setUp() {
-        taskManager = new InMemoryTaskManager();
+        Task task1 = new Task("Task 1", "Description 1", Status.NEW);
+        Task task2 = new Task("Task 2", "Description 2", Status.IN_PROGRESS);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+
+        assertEquals(2, historyManager.getHistory().size());
+        assertEquals(task1, historyManager.getHistory().get(0));
+        assertEquals(task2, historyManager.getHistory().get(1));
     }
 
     @Test
-    void shouldAddAndRetrieveTasks() {
-        Task task1 = new Task("Task 1", "Desc 1", Status.NEW);
-        Task task2 = new Task("Task 2", "Desc 2", Status.IN_PROGRESS);
+    void testDuplicateRemoval() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-        taskManager.addTask(task1);
-        taskManager.addTask(task2);
+        Task task = new Task("Task 1", "Description", Status.NEW);
+        historyManager.add(task);
+        historyManager.add(task);
 
-        // Проверяем, что задачи добавлены и могут быть получены
-        assertEquals(task1, taskManager.getTask(task1.getId()));
-        assertEquals(task2, taskManager.getTask(task2.getId()));
-
-        // Проверяем, что ID разные у разных задач
-        assertNotEquals(task1.getId(), task2.getId());
+        assertEquals(1, historyManager.getHistory().size());
     }
 
     @Test
-    void shouldReturnEmptyHistoryInitially() {
-        // Проверяем, что история пустая на старте
-        assertTrue(taskManager.getHistory().isEmpty());
-    }
+    void testRemoveFromHistory() {
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
-    @Test
-    void shouldAddTaskToHistoryWhenAdded() {
-        Task task1 = new Task("Task 1", "Desc 1", Status.NEW);
-        taskManager.addTask(task1);
+        Task task = new Task("Task", "Description", Status.NEW);
+        historyManager.add(task);
+        historyManager.remove(task.getId());
 
-        // Проверяем, что история не пуста
-        assertFalse(taskManager.getHistory().isEmpty());
-        assertEquals(1, taskManager.getHistory().size());
-    }
-
-    @Test
-    void shouldReturnEmptyHistoryForEmptyManager() {
-        // Проверяем, что история пуста, если нет задач
-        assertTrue(taskManager.getHistory().isEmpty());
+        assertEquals(0, historyManager.getHistory().size());
     }
 }

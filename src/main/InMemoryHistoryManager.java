@@ -40,7 +40,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         return history;
     }
 
-    // добавляем задачу в конец списка
     private void linkLast(Task task) {
         Node newNode = new Node(task);
 
@@ -54,24 +53,23 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    // удаляем узел
     private void removeNode(Node node) {
         if (node == null) return;
 
-        if (node == head && node == tail) {  // если один элемент
+        if (node == head && node == tail) {
             head = null;
             tail = null;
-        } else if (node == head) {           // удаление головы
+        } else if (node == head) {
             head = node.next;
             if (head != null) {
                 head.prev = null;
             }
-        } else if (node == tail) {           // удаление хвоста
+        } else if (node == tail) {
             tail = node.prev;
             if (tail != null) {
                 tail.next = null;
             }
-        } else {                             // удаляем из середины
+        } else {
             Node prev = node.prev;
             Node next = node.next;
 
