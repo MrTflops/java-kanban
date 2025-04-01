@@ -3,8 +3,8 @@ package model;
 public class Subtask extends Task {
     private final int epicId;
 
-    public Subtask(String title, String description, Status status, int epicId) {
-        super(title, description, status);
+    public Subtask(String nameTask, String descriptionTask, TaskStatus status, int epicId) {
+        super(nameTask, descriptionTask, status);
         this.epicId = epicId;
     }
 
@@ -13,7 +13,13 @@ public class Subtask extends Task {
     }
 
     @Override
-    public void setId(int id) {
-        super.setId(id);
+    public String toString() {
+        return getClass().getSimpleName()
+                + "{ nameTask='" + nameTask
+                + "', descriptionTask ='" + descriptionTask
+                + "', statusOfTask='" + statusOfTask
+                + "', id=" + id
+                + "', epicId=" + epicId
+                + '}';
     }
 }

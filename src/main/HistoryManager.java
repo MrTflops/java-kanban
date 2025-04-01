@@ -1,6 +1,7 @@
 package main;
 
-import model.Task;
+import model.*;
+
 import java.util.List;
 
 public interface HistoryManager {
@@ -10,4 +11,5 @@ public interface HistoryManager {
     void remove(int id);
 
     List<Task> getHistory();
+
 }

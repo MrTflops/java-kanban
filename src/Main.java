@@ -1,34 +1,84 @@
-package main;
-
-import model.Epic;
-import model.Status;
-import model.Subtask;
-import model.Task;
+import model.*;
+import main.Managers;
+import main.TaskManager;
 
 public class Main {
+
     public static void main(String[] args) {
+
         TaskManager manager = Managers.getDefault();
 
-        // Создание задач
-        Task task = new Task("Test Task", "Simple task", Status.NEW);
-        Epic epic = new Epic("Epic Task", "Big task with subtasks");
-        Subtask subtask1 = new Subtask("Subtask 1", "Part 1", Status.NEW, epic.getId());
-        Subtask subtask2 = new Subtask("Subtask 2", "Part 2", Status.NEW, epic.getId());
+        // Создание
 
-        // Добавление задач в менеджер
-        manager.addTask(task);
-        manager.addEpic(epic);
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
+        Task task1 = new Task("Task #1", "Task1 description");
+        final int taskId1 = manager.addNewTask(task1);
+        Task task2 = new Task("Task #2", "Task2 description", TaskStatus.IN_PROGRESS);
+        final int taskId2 = manager.addNewTask(task2);
 
-        // Обращение к задачам для тестирования истории просмотров
-        System.out.println("Просмотр задачи: " + manager.getTask(task.getId()));
-        System.out.println("Просмотр эпика: " + manager.getEpic(epic.getId()));
-        System.out.println("Просмотр подзадачи 1: " + manager.getSubtask(subtask1.getId()));
-        System.out.println("Просмотр подзадачи 2: " + manager.getSubtask(subtask2.getId()));
+        Epic epic1 = new Epic("Epic #1", "Epic1 description");
+        final int epicId1 = manager.addNewEpic(epic1);
+        Epic epic2 = new Epic("Epic #2", "Epic2 description");
+        final int epicId2 = manager.addNewEpic(epic2);
 
-        // Вывод истории просмотров
-        System.out.println("\nИстория просмотров:");
-        manager.getHistory().forEach(System.out::println);
+        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", TaskStatus.NEW, epicId1);
+        final int subtaskId1 = manager.addNewSubtask(subtask1);
+        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask2 description", TaskStatus.NEW, epicId1);
+        final int subtaskId2 = manager.addNewSubtask(subtask2);
+        Subtask subtask3 = new Subtask("Subtask #1-2", "Subtask1 description", TaskStatus.NEW, epicId2);
+        final int subtaskId3 = manager.addNewSubtask(subtask3);
+
+        System.out.println(manager.getTaskList());
+        System.out.println(manager.getEpicList());
+        System.out.println(manager.getSubtaskList());
+
+        // Обновление
+
+        task1.setStatusOfTask(TaskStatus.IN_PROGRESS);
+        manager.updateTask(task1);
+        System.out.println("CHANGE STATUS: task1 NEW->IN_PROGRESS");
+        task2.setStatusOfTask(TaskStatus.DONE);
+        manager.updateTask(task2);
+        System.out.println("CHANGE STATUS: task2 IN_PROGRESS->DONE");
+
+        System.out.println("Задачи:");
+        System.out.println(manager.getTaskList());
+
+
+        subtask1.setStatusOfTask(TaskStatus.IN_PROGRESS);
+        System.out.println("CHANGE STATUS: subtask1 NEW->IN_PROGRESS");
+        manager.updateSubtask(subtask1);
+
+        subtask2.setStatusOfTask(TaskStatus.DONE);
+        System.out.println("CHANGE STATUS: subtask2 NEW->DONE");
+        manager.updateSubtask(subtask2);
+
+        subtask3.setStatusOfTask(TaskStatus.DONE);
+        System.out.println("CHANGE STATUS: subtask3 NEW->DONE");
+        manager.updateSubtask(subtask3);
+
+        System.out.println("Подзадачи:");
+
+        System.out.println(manager.getSubtaskList());
+
+
+        System.out.println("Эпики:");
+
+        System.out.println(manager.getEpicList());
+
+
+        // Удаление
+
+        System.out.println("DELETE: task1");
+
+        manager.deleteTaskById(taskId1);
+
+        System.out.println("DELETE: epic1");
+
+        manager.deleteEpicById(epicId1);
+
+        System.out.println(manager.getTaskList());
+        System.out.println(manager.getEpicList());
+        System.out.println(manager.getSubtaskList());
+
     }
 }
