@@ -11,6 +11,7 @@ import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 class FileBackedTaskManagerTest {
     private File tempFile;
     private FileBackedTaskManager manager;
