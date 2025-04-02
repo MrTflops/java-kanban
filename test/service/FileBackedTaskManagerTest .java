@@ -1,4 +1,4 @@
-/*package test.service;
+package test.service;
 
 import main.FileBackedTaskManager;
 import model.*;
@@ -56,4 +56,4 @@ class FileBackedTaskManagerTest {
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
         assertNull(loadedManager.getTask(task.getId()));
     }
-}*/
+}
