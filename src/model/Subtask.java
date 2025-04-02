@@ -11,4 +11,9 @@ public class Subtask extends Task {
     public int getEpicId() {
         return epicId;
     }
+
+    //Метод для установки ID
+    public void setId(int id) {
+        super.setId(id);
+    }
 }

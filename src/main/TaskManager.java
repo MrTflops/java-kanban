@@ -7,16 +7,27 @@ import model.Subtask;
 import java.util.List;
 
 public interface TaskManager {
-    Task getTask(int id);        // Получить задачу по ID
-    Epic getEpic(int id);        // Получить эпик по ID
-    Subtask getSubtask(int id);  // Получить подзадачу по ID
-    List<Task> getHistory();     // Получить историю просмотров
+    // Основной метод
+    Task getTask(int id);
 
-    void addTask(Task task);           // Добавить задачу
-    void addEpic(Epic epic);           // Добавить эпик
-    void addSubtask(Subtask subtask);  // Добавить подзадачу
+    // Версия с контролем истории (если нужно)
+    Task getTask(int id, boolean addToHistory);
 
-    void deleteTaskById(int id);       // Удалить задачу по ID
-    List<Task> getAllTasks();          // Получить все задачи
-    void deleteAllTasks();             // Удалить все задачи
+    Epic getEpic(int id);
+
+    Subtask getSubtask(int id);
+
+    List<Task> getHistory();
+
+    void addTask(Task task);
+
+    void addEpic(Epic epic);
+
+    void addSubtask(Subtask subtask);
+
+    void deleteTaskById(int id);
+
+    List<Task> getAllTasks();
+
+    void deleteAllTasks();
 }
