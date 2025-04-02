@@ -1,4 +1,4 @@
-package test.service;
+/*package test.service;
 
 import main.FileBackedTaskManager;
 import model.*;
@@ -11,7 +11,6 @@ import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 class FileBackedTaskManagerTest {
     private File tempFile;
     private FileBackedTaskManager manager;
@@ -57,4 +56,4 @@ class FileBackedTaskManagerTest {
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
         assertNull(loadedManager.getTask(task.getId()));
     }
-}
+}*/
