@@ -1,6 +1,6 @@
-./test/model/EpicTest.java
-./test/model/SubtaskTest.java
-./test/model/TaskTest.java
-./test/service/FileBackedTaskManagerTest.java
-./test/service/InMemoryHistoryManagerTest.java
-./test/service/InMemoryTaskManagerTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/model/EpicTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/model/SubtaskTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/model/TaskTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/service/InMemoryHistoryManagerTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/service/FileBackedTaskManagerTest.java
+/Users/mrtflops/IdeaProjects/java-kanban/test/service/InMemoryTaskManagerTest.java
