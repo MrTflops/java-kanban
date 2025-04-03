@@ -84,6 +84,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static Task taskFromString(String value) {
         String[] parts = value.split(",");
+        if (parts.length < 5) {
+            throw new IllegalArgumentException(String.format(
+                    "Некорректный формат строки. Ожидалось минимум 5 значений, получено %d: %s",
+                    parts.length, value));
+        }
 
         int id = Integer.parseInt(parts[0]);
         Type type = Type.valueOf(parts[1]);
@@ -97,17 +102,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.setId(id);
                 epic.setStatus(status);
                 return epic;
+
             case SUBTASK:
+                if (parts.length < 6) {
+                    throw new IllegalArgumentException(String.format(
+                            "Для подзадачи ожидалось 6 значений, получено %d: %s",
+                            parts.length, value));
+                }
                 int epicId = Integer.parseInt(parts[5]);
                 Subtask subtask = new Subtask(title, description, status, epicId);
                 subtask.setId(id);
                 return subtask;
+
             case TASK:
                 Task task = new Task(title, description, status);
                 task.setId(id);
                 return task;
+
             default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
+                throw new IllegalArgumentException(String.format(
+                        "Неизвестный тип задачи: %s. Строка: %s",
+                        type, value));
         }
     }
 
