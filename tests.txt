@@ -1,6 +1,6 @@
 ./test/model/EpicTest.java
 ./test/model/SubtaskTest.java
 ./test/model/TaskTest.java
-./test/service/FileBackedTaskManagerTest .java
+./test/service/FileBackedTaskManagerTest.java
 ./test/service/InMemoryHistoryManagerTest.java
 ./test/service/InMemoryTaskManagerTest.java
