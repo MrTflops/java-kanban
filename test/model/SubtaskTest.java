@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SubtaskTest {
 
     @Test
-    void shouldGenerateUniqueIdsForSubtasks() {
+    void generateUniqueIds() {
         Subtask subtask1 = new Subtask("Subtask 1", "Desc 1", Status.NEW, 1);
         Subtask subtask2 = new Subtask("Subtask 2", "Desc 2", Status.IN_PROGRESS, 2);
 
@@ -15,7 +15,7 @@ public class SubtaskTest {
     }
 
     @Test
-    void shouldReturnCorrectEpicId() {
+    void returnCorrectEpicId() {
         Subtask subtask = new Subtask("Subtask", "Description", Status.NEW, 10);
 
         // Проверяем правильность Epic ID
@@ -23,7 +23,7 @@ public class SubtaskTest {
     }
 
     @Test
-    void shouldReturnCorrectStatus() {
+    void returnCorrectStatus() {
         Subtask subtask = new Subtask("Subtask", "Description", Status.NEW, 10);
 
         // Проверяем статус подзадачи

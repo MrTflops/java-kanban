@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskTest {
 
     @Test
-    void shouldGenerateUniqueIdsForTasks() {
+    void generateUniqueIdsForTasks() {
         Task task1 = new Task("Task 1", "Description 1", Status.NEW);
         Task task2 = new Task("Task 2", "Description 2", Status.IN_PROGRESS);
 
@@ -17,7 +17,7 @@ public class TaskTest {
     }
 
     @Test
-    void shouldReturnCorrectTitleAndDescription() {
+    void returnCorrectTitleAndDescription() {
         Task task = new Task("Test Task", "Test Description", Status.DONE);
 
         // Проверяем, что данные корректные
@@ -27,7 +27,7 @@ public class TaskTest {
     }
 
     @Test
-    void shouldReturnCorrectStatus() {
+    void returnCorrectStatus() {
         Task task = new Task("Test Task", "Test Description", Status.NEW);
 
         // Проверяем статус
