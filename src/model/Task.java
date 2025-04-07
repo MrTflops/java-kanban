@@ -6,26 +6,31 @@ import java.util.Objects;
 
 public class Task {
     private static int idCounter = 1;
-    private int id;   // убрал `final`, чтобы можно было изменять ID
+    private int id;
     private String title;
     private String description;
     private Status status;
     private LocalDateTime startTime;
     private Duration duration;
 
-
     public Task(String title, String description, Status status) {
+        this(title, description, status, null, null);
+    }
+
+    public Task(String title, String description, Status status,
+                Duration duration, LocalDateTime startTime) {
         this.id = idCounter++;
         this.title = title;
         this.description = description;
         this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public int getId() {
         return id;
     }
 
-    // Метод для установки ID
     public void setId(int id) {
         this.id = id;
     }
@@ -54,18 +59,37 @@ public class Task {
         this.status = status;
     }
 
-    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
 
-    public Duration getDuration() { return duration; }
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
 
     public LocalDateTime getEndTime() {
-        return startTime != null && duration != null ? startTime.plus(duration) : null;
+        if (startTime != null && duration != null) {
+            return startTime.plus(duration);
+        }
+        return null;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)) {
+            return false;
+        }
         Task task = (Task) o;
         return id == task.id;
     }
