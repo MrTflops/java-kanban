@@ -1,21 +1,27 @@
 package main;
 
-import model.Epic;
-import model.Status;
-import model.Subtask;
-import model.Task;
-import model.Type;
+import model.*;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
     public FileBackedTaskManager(File file) {
         this.file = file;
+    }
+
+    private List<Task> getAllTasks() {
+        List<Task> allTasks = new ArrayList<>();
+        allTasks.addAll(tasks.values());
+        allTasks.addAll(epics.values());
+        allTasks.addAll(subtasks.values());
+        return allTasks;
     }
 
     @Override
