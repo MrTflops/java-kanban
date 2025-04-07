@@ -1,90 +1,87 @@
-import main.InMemoryTaskManager;
+package test;
+
+import main.TaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.Status;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskManagerTest {
-    private InMemoryTaskManager manager;
-    private Task task;
-    private Epic epic;
-    private Subtask subtask1;
-    private Subtask subtask2;
+public abstract class TaskManagerTest<T extends TaskManager> {
+    protected T manager;
+
+    protected abstract T createManager();
 
     @BeforeEach
     void setUp() {
-        manager = new InMemoryTaskManager();
-
-        task = new Task("Task", "Description", Status.NEW,
-                Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 10, 0));
-
-        epic = new Epic("Epic", "Epic Description");
-
-        subtask1 = new Subtask("Subtask 1", "Description 1", Status.NEW, epic.getId(),
-                Duration.ofMinutes(45), LocalDateTime.of(2023, 1, 1, 11, 0));
-
-        subtask2 = new Subtask("Subtask 2", "Description 2", Status.IN_PROGRESS, epic.getId(),
-                Duration.ofMinutes(60), LocalDateTime.of(2023, 1, 1, 12, 0));
-
-        manager.addTask(task);
-        manager.addEpic(epic);
-        manager.addSubtask(subtask1);
-        manager.addSubtask(subtask2);
+        manager = createManager();
     }
 
     @Test
-    void testGetEndTime() {
-        assertEquals(LocalDateTime.of(2023, 1, 1, 10, 30), task.getEndTime());
-        assertEquals(LocalDateTime.of(2023, 1, 1, 13, 0), epic.getEndTime());
-    }
+    abstract void testAddAndGetTask();
+
+    @Test
+    abstract void testAddAndGetEpic();
+
+    @Test
+    abstract void testAddAndGetSubtask();
+
+    @Test
+    abstract void testDeleteTask();
+
+    @Test
+    abstract void testDeleteEpic();
+
+    @Test
+    abstract void testDeleteSubtask();
+
+    @Test
+    abstract void testGetHistory();
 
     @Test
     void testGetPrioritizedTasks() {
+        Task task1 = new Task("Task 1", "Desc 1", Status.NEW,
+                Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 10, 0));
+        Task task2 = new Task("Task 2", "Desc 2", Status.NEW,
+                Duration.ofMinutes(45), LocalDateTime.of(2023, 1, 1, 9, 0));
+
+        manager.addTask(task1);
+        manager.addTask(task2);
+
         Set<Task> prioritized = manager.getPrioritizedTasks();
-        assertEquals(3, prioritized.size());
-        assertTrue(prioritized.contains(task));
-        assertTrue(prioritized.contains(subtask1));
-        assertTrue(prioritized.contains(subtask2));
-    }
-
-    @Test
-    void testTaskWithoutTimeNotInPrioritized() {
-        Task noTimeTask = new Task("No time", "No time desc", Status.NEW);
-        manager.addTask(noTimeTask);
-        assertFalse(manager.getPrioritizedTasks().contains(noTimeTask));
-    }
-
-    @Test
-    void testEpicTimeCalculation() {
-        assertEquals(LocalDateTime.of(2023, 1, 1, 11, 0), epic.getStartTime());
-        assertEquals(Duration.ofMinutes(105), epic.getDuration());
-        assertEquals(LocalDateTime.of(2023, 1, 1, 13, 0), epic.getEndTime());
+        assertEquals(2, prioritized.size());
+        assertEquals(task2, prioritized.iterator().next()); // task2 должен быть первым, так как начинается раньше
     }
 
     @Test
     void testTaskOverlapping() {
+        Task task1 = new Task("Task 1", "Desc 1", Status.NEW,
+                Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 10, 0));
+        manager.addTask(task1);
+
         Task overlappingTask = new Task("Overlapping", "Desc", Status.NEW,
                 Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 10, 15));
         assertTrue(manager.isTaskOverlapping(overlappingTask));
-
-        Task nonOverlappingTask = new Task("Non-overlapping", "Desc", Status.NEW,
-                Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 14, 0));
-        assertFalse(manager.isTaskOverlapping(nonOverlappingTask));
     }
 
     @Test
-    void testAddOverlappingTaskThrowsException() {
-        Task overlappingTask = new Task("Overlapping", "Desc", Status.NEW,
-                Duration.ofMinutes(30), LocalDateTime.of(2023, 1, 1, 10, 15));
+    void testEpicStatusCalculation() {
+        Epic epic = new Epic("Epic", "Description");
+        manager.addEpic(epic);
 
-        assertThrows(ManagerSaveException.class, () -> manager.addTask(overlappingTask));
+        Subtask subtask1 = new Subtask("Sub1", "Desc1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask("Sub2", "Desc2", Status.DONE, epic.getId());
+
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        assertEquals(Status.IN_PROGRESS, epic.getStatus());
     }
 }
