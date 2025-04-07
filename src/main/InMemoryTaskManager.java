@@ -11,11 +11,10 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Set<Task> prioritizedTasks = new TreeSet<>(
-            Comparator.comparing(
-                    Task::getStartTime,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-                            .thenComparing(Task::getId)
-            );
+            Comparator
+                    .comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .thenComparing(Task::getId)
+    );
 
     // таски
     @Override
