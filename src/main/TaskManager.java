@@ -7,6 +7,7 @@ import model.Subtask;
 import java.util.List;
 
 public interface TaskManager {
+
     List<Task> getTasks();
     Task getTask(int id);
     Task getTask(int id, boolean addToHistory);
