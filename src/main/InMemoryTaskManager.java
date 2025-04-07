@@ -1,17 +1,68 @@
 package main;
 
 import model.Epic;
-import model.Status;
 import model.Subtask;
 import model.Task;
+import model.Status;
 
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.Duration;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final HistoryManager historyManager = new InMemoryHistoryManager();
+
+    private final Set<Task> prioritizedTasks = new TreeSet<>((t1, t2) -> {
+        if (t1.getStartTime() == null && t2.getStartTime() == null) {
+            return Integer.compare(t1.getId(), t2.getId());
+        }
+        if (t1.getStartTime() == null) return 1;
+        if (t2.getStartTime() == null) return -1;
+        return t1.getStartTime().compareTo(t2.getStartTime());
+    });
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
+    @Override
+    public void addTask(Task task) {
+        if (isTaskOverlapping(task)) {
+            throw new ManagerSaveException("Задача пересекается по времени с существующей");
+        }
+        tasks.put(task.getId(), task);
+        prioritizedTasks.add(task);
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        if (isTaskOverlapping(task)) {
+            throw new ManagerSaveException("Задача пересекается по времени с существующей");
+        }
+        tasks.put(task.getId(), task);
+        prioritizedTasks.add(task);
+    }
+
+    private boolean isTaskOverlapping(Task newTask) {
+        if (newTask.getStartTime() == null || newTask.getDuration() == null) {
+            return false;
+        }
+
+        return prioritizedTasks.stream()
+                .filter(task -> task.getStartTime() != null && task.getDuration() != null)
+                .anyMatch(existingTask -> {
+                    LocalDateTime newStart = newTask.getStartTime();
+                    LocalDateTime newEnd = newTask.getEndTime();
+                    LocalDateTime existingStart = existingTask.getStartTime();
+                    LocalDateTime existingEnd = existingTask.getEndTime();
+
+                    return newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart);
+                });
+    }
 
     @Override
     public Task getTask(int id) {
