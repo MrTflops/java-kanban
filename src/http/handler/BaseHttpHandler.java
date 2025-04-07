@@ -2,19 +2,20 @@ package http.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import http.*;
+import com.sun.net.httpserver.HttpHandler;
+import http.HttpTaskServer;
 import main.TaskManager;
-import main.ManagerSaveException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
     protected final TaskManager taskManager;
     protected final Gson gson;
 
-    public BaseHttpHandler(TaskManager taskManager) {
+    protected BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
         this.gson = HttpTaskServer.getGson();
     }
@@ -23,8 +24,9 @@ public class BaseHttpHandler {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(resp);
+        }
     }
 
     protected void sendSuccess(HttpExchange exchange) throws IOException {
@@ -48,21 +50,16 @@ public class BaseHttpHandler {
     }
 
     protected String readText(HttpExchange exchange) throws IOException {
-        InputStream inputStream = exchange.getRequestBody();
-        return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        try (InputStream is = exchange.getRequestBody()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
-    protected String getPathParam(HttpExchange exchange) {
-        String path = exchange.getRequestURI().getPath();
-        String[] pathParts = path.split("/");
-        return pathParts.length > 2 ? pathParts[2] : null;
-    }
-
-    protected void handleException(HttpExchange exchange, Exception e) throws IOException {
-        if (e instanceof ManagerSaveException) {
-            sendInternalError(exchange);
-        } else {
-            sendNotFound(exchange);
+    protected Integer parseId(String path) {
+        try {
+            return Integer.parseInt(path);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }
