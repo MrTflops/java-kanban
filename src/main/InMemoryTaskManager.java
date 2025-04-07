@@ -11,9 +11,15 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Set<Task> prioritizedTasks = new TreeSet<>(
-            Comparator
-                    .comparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
-                    .thenComparing(Task::getId)
+            (t1, t2) -> {
+                if (t1.getStartTime() == null && t2.getStartTime() == null) {
+                    return Integer.compare(t1.getId(), t2.getId());
+                }
+                if (t1.getStartTime() == null) return 1;
+                if (t2.getStartTime() == null) return -1;
+                int timeCompare = t1.getStartTime().compareTo(t2.getStartTime());
+                return timeCompare != 0 ? timeCompare : Integer.compare(t1.getId(), t2.getId());
+            }
     );
 
     // таски
@@ -23,9 +29,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id, boolean addToHistory) {
         Task task = tasks.get(id);
-        if (task != null) {
+        if (task != null && addToHistory) {
             historyManager.add(task);
         }
         return task;
