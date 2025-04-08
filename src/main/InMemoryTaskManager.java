@@ -6,23 +6,18 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final Set<Task> prioritizedTasks = new TreeSet<>(
-            (t1, t2) -> {
-                if (t1.getStartTime() == null && t2.getStartTime() == null) {
-                    return Integer.compare(t1.getId(), t2.getId());
-                }
-                if (t1.getStartTime() == null) return 1;
-                if (t2.getStartTime() == null) return -1;
-                int timeCompare = t1.getStartTime().compareTo(t2.getStartTime());
-                return timeCompare != 0 ? timeCompare : Integer.compare(t1.getId(), t2.getId());
-            }
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final Set<Task> prioritizedTasks = new TreeSet<>(
+            Comparator.comparing(
+                    Task::getStartTime,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            ).thenComparing(Task::getId)
     );
 
-    // таски
+    // Методы для таски
     @Override
     public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
@@ -89,7 +84,7 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.clear();
     }
 
-    //сабтаски
+    // Методы для сабтаски
     @Override
     public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
@@ -176,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
         });
     }
 
-    // эпики
+    // Методы для эпика
     @Override
     public List<Epic> getEpics() {
         return new ArrayList<>(epics.values());
@@ -236,7 +231,7 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.removeIf(task -> task instanceof Subtask);
     }
 
-    // общие методы
+    // Общие методы
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
@@ -247,7 +242,15 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    // вспомогательные методы
+    // Вспомогательные методы
+    protected List<Task> getAllTasks() {
+        List<Task> allTasks = new ArrayList<>();
+        allTasks.addAll(tasks.values());
+        allTasks.addAll(epics.values());
+        allTasks.addAll(subtasks.values());
+        return allTasks;
+    }
+
     private void updateEpicStatus(Epic epic) {
         if (epic == null) return;
 

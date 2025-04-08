@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private final List<Integer> subtaskIds;
+    private final List<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(String title, String description) {
         super(title, description, Status.NEW);
-        this.subtaskIds = new ArrayList<>();
     }
 
     public List<Integer> getSubtaskIds() {
@@ -16,16 +15,16 @@ public class Epic extends Task {
     }
 
     public void addSubtaskId(int subtaskId) {
-        if (subtaskId != this.getId()) {  // Проверка, чтобы эпик не добавлял сам себя
+        if (!subtaskIds.contains(subtaskId)) {
             subtaskIds.add(subtaskId);
         }
     }
 
-    public void clearSubtaskIds() {
-        subtaskIds.clear();
-    }
-
     public void removeSubtaskId(int subtaskId) {
         subtaskIds.remove((Integer) subtaskId);
+    }
+
+    public void clearSubtaskIds() {
+        subtaskIds.clear();
     }
 }

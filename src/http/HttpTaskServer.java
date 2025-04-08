@@ -3,7 +3,8 @@ package http;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
-import main.*;
+import main.TaskManager;
+import main.Managers;
 import http.handler.*;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class HttpTaskServer {
     private static final int PORT = 8080;
     private final HttpServer server;
+    private final TaskManager taskManager;
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
