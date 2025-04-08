@@ -1,7 +1,6 @@
 package main.http;
 
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
 import main.TaskManager;
 import main.Managers;
 import main.http.handler.*;
