@@ -16,9 +16,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    private List<Task> getAllTasks() {
-        List<Task> allTasks = new ArrayList<>();
-        allTasks.addAll(tasks.values());
+    @Override
+    public List<Task> getAllTasks() {
+        List<Task> allTasks = new ArrayList<>(tasks.values());
         allTasks.addAll(epics.values());
         allTasks.addAll(subtasks.values());
         return allTasks;

@@ -11,6 +11,8 @@ public interface TaskManager {
     //таска
     List<Task> getTasks();
 
+    List<Task> getAllTasks();
+
     Task getTask(int id);
 
     Task getTask(int id, boolean addToHistory);
