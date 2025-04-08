@@ -1,26 +1,35 @@
 package http.handler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import main.TaskManager;
-
+import model.Task;
 import java.io.IOException;
+import java.util.List;
 
 public class PrioritizedHandler extends BaseHttpHandler {
+    private final TaskManager taskManager;
+
     public PrioritizedHandler(TaskManager taskManager) {
-        super(taskManager);
+        this.taskManager = taskManager;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             if ("GET".equals(exchange.getRequestMethod())) {
-                String response = gson.toJson(taskManager.getPrioritizedTasks());
-                sendText(exchange, response);
+                handleGetPrioritizedTasks(exchange);
             } else {
                 sendNotFound(exchange);
             }
         } catch (Exception e) {
-            handleException(exchange, e);
+            sendInternalError(exchange);
         }
+    }
+
+    private void handleGetPrioritizedTasks(HttpExchange exchange) throws IOException {
+        List<Task> tasks = taskManager.getAllTasks(); // В текущей реализации нет приоритетов, используем все задачи
+        String response = gson.toJson(tasks);
+        sendSuccess(exchange, response);
     }
 }

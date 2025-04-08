@@ -1,89 +1,113 @@
 package http.handler;
 
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import main.*;
 import model.Task;
-import main.TaskManager;
-
 import java.io.IOException;
+import java.util.List;
 
 public class TasksHandler extends BaseHttpHandler {
+    private final TaskManager taskManager;
+
     public TasksHandler(TaskManager taskManager) {
-        super(taskManager);
+        this.taskManager = taskManager;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             String method = exchange.getRequestMethod();
-            String pathParam = getPathParam(exchange);
+            String path = exchange.getRequestURI().getPath();
+            String[] pathParts = path.split("/");
 
             switch (method) {
                 case "GET":
-                    handleGet(exchange, pathParam);
+                    if (pathParts.length == 2) { // /tasks
+                        handleGetAllTasks(exchange);
+                    } else if (pathParts.length == 3) { // /tasks/{id}
+                        handleGetTaskById(exchange, pathParts[2]);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                     break;
                 case "POST":
-                    handlePost(exchange);
+                    if (pathParts.length == 2) { // /tasks
+                        handleCreateOrUpdateTask(exchange);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                     break;
                 case "DELETE":
-                    handleDelete(exchange, pathParam);
+                    if (pathParts.length == 3) { // /tasks/{id}
+                        handleDeleteTask(exchange, pathParts[2]);
+                    } else if (pathParts.length == 2) { // /tasks
+                        handleDeleteAllTasks(exchange);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                     break;
                 default:
                     sendNotFound(exchange);
             }
         } catch (Exception e) {
-            handleException(exchange, e);
+            sendInternalError(exchange);
         }
     }
 
-    private void handleGet(HttpExchange exchange, String pathParam) throws IOException {
-        if (pathParam == null) {
-            String response = gson.toJson(taskManager.getTasks());
-            sendText(exchange, response);
-        } else {
-            try {
-                int id = Integer.parseInt(pathParam);
-                Task task = taskManager.getTask(id);
-                if (task != null) {
-                    sendText(exchange, gson.toJson(task));
-                } else {
-                    sendNotFound(exchange);
-                }
-            } catch (NumberFormatException e) {
-                sendNotFound(exchange);
-            }
-        }
+    private void handleGetAllTasks(HttpExchange exchange) throws IOException {
+        List<Task> tasks = taskManager.getAllTasks();
+        String response = gson.toJson(tasks);
+        sendSuccess(exchange, response);
     }
 
-    private void handlePost(HttpExchange exchange) throws IOException {
-        String body = readText(exchange);
+    private void handleGetTaskById(HttpExchange exchange, String idStr) throws IOException {
         try {
-            Task task = gson.fromJson(body, Task.class);
-            if (task.getId() != 0) {
-                taskManager.updateTask(task);
+            int id = Integer.parseInt(idStr);
+            Task task = taskManager.getTask(id);
+            if (task == null) {
+                sendNotFound(exchange);
             } else {
-                taskManager.addTask(task);
+                String response = gson.toJson(task);
+                sendSuccess(exchange, response);
             }
-            sendSuccess(exchange);
-        } catch (JsonSyntaxException e) {
+        } catch (NumberFormatException e) {
             sendNotFound(exchange);
-        } catch (ManagerSaveException e) {
+        }
+    }
+
+    private void handleCreateOrUpdateTask(HttpExchange exchange) throws IOException {
+        Task task = readRequest(exchange, Task.class);
+        if (task == null) {
+            sendNotFound(exchange);
+            return;
+        }
+
+        try {
+            if (task.getId() == 0) { // New task
+                taskManager.addTask(task);
+                sendCreated(exchange, gson.toJson(task));
+            } else { // Update existing task
+                taskManager.addTask(task); // Предполагаем, что addTask также обновляет существующие
+                sendSuccess(exchange, gson.toJson(task));
+            }
+        } catch (Exception e) {
             sendHasInteractions(exchange);
         }
     }
 
-    private void handleDelete(HttpExchange exchange, String pathParam) throws IOException {
-        if (pathParam != null) {
-            try {
-                int id = Integer.parseInt(pathParam);
-                taskManager.deleteTaskById(id);
-                sendSuccess(exchange);
-            } catch (NumberFormatException e) {
-                sendNotFound(exchange);
-            }
-        } else {
-            taskManager.deleteAllTasks();
-            sendSuccess(exchange);
+    private void handleDeleteTask(HttpExchange exchange, String idStr) throws IOException {
+        try {
+            int id = Integer.parseInt(idStr);
+            taskManager.deleteTaskById(id);
+            sendSuccess(exchange, "Task deleted");
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
         }
+    }
+
+    private void handleDeleteAllTasks(HttpExchange exchange) throws IOException {
+        taskManager.deleteAllTasks();
+        sendSuccess(exchange, "All tasks deleted");
     }
 }

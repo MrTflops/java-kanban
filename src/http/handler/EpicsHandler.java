@@ -1,15 +1,16 @@
 package http.handler;
 
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import model.Epic;
 import main.TaskManager;
-
+import model.Epic;
 import java.io.IOException;
 
 public class EpicsHandler extends BaseHttpHandler {
+    private final TaskManager taskManager;
+
     public EpicsHandler(TaskManager taskManager) {
-        super(taskManager);
+        this.taskManager = taskManager;
     }
 
     @Override
@@ -21,48 +22,76 @@ public class EpicsHandler extends BaseHttpHandler {
 
             switch (method) {
                 case "GET":
-                    if (pathParts.length == 2) {
-                        String response = gson.toJson(taskManager.getEpics());
-                        sendText(exchange, response);
-                    } else if (pathParts.length == 3) {
-                        int id = Integer.parseInt(pathParts[2]);
-                        Epic epic = taskManager.getEpic(id);
-                        if (epic != null) {
-                            sendText(exchange, gson.toJson(epic));
-                        } else {
-                            sendNotFound(exchange);
-                        }
-                    } else if (pathParts.length == 4 && "subtasks".equals(pathParts[3])) {
-                        int id = Integer.parseInt(pathParts[2]);
-                        String subtasksResponse = gson.toJson(taskManager.getEpicSubtasks(id));
-                        sendText(exchange, subtasksResponse);
+                    if (pathParts.length == 3) { // /epics/{id}
+                        handleGetEpicById(exchange, pathParts[2]);
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "POST":
-                    String body = readText(exchange);
-                    Epic epic = gson.fromJson(body, Epic.class);
-                    taskManager.addEpic(epic);
-                    sendSuccess(exchange);
+                    if (pathParts.length == 2) { // /epics
+                        handleCreateOrUpdateEpic(exchange);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                     break;
                 case "DELETE":
-                    if (pathParts.length == 3) {
-                        int id = Integer.parseInt(pathParts[2]);
-                        taskManager.deleteEpicById(id);
-                        sendSuccess(exchange);
+                    if (pathParts.length == 3) { // /epics/{id}
+                        handleDeleteEpic(exchange, pathParts[2]);
                     } else {
-                        taskManager.deleteAllEpics();
-                        sendSuccess(exchange);
+                        sendNotFound(exchange);
                     }
                     break;
                 default:
                     sendNotFound(exchange);
             }
-        } catch (JsonSyntaxException | NumberFormatException e) {
-            sendNotFound(exchange);
         } catch (Exception e) {
-            handleException(exchange, e);
+            sendInternalError(exchange);
+        }
+    }
+
+    private void handleGetEpicById(HttpExchange exchange, String idStr) throws IOException {
+        try {
+            int id = Integer.parseInt(idStr);
+            Epic epic = taskManager.getEpic(id);
+            if (epic == null) {
+                sendNotFound(exchange);
+            } else {
+                String response = gson.toJson(epic);
+                sendSuccess(exchange, response);
+            }
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
+        }
+    }
+
+    private void handleCreateOrUpdateEpic(HttpExchange exchange) throws IOException {
+        Epic epic = readRequest(exchange, Epic.class);
+        if (epic == null) {
+            sendNotFound(exchange);
+            return;
+        }
+
+        try {
+            if (epic.getId() == 0) { // New epic
+                taskManager.addEpic(epic);
+                sendCreated(exchange, gson.toJson(epic));
+            } else { // Update existing epic
+                taskManager.addEpic(epic);
+                sendSuccess(exchange, gson.toJson(epic));
+            }
+        } catch (Exception e) {
+            sendHasInteractions(exchange);
+        }
+    }
+
+    private void handleDeleteEpic(HttpExchange exchange, String idStr) throws IOException {
+        try {
+            int id = Integer.parseInt(idStr);
+            taskManager.deleteTaskById(id);
+            sendSuccess(exchange, "Epic deleted");
+        } catch (NumberFormatException e) {
+            sendNotFound(exchange);
         }
     }
 }
