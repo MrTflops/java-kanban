@@ -1,14 +1,14 @@
-package http.handler;
+package main.http.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import main.TaskManager;
-import model.Subtask;
+import model.Epic;
 import java.io.IOException;
 
-public class SubtasksHandler extends BaseHttpHandler {
+public class EpicsHandler extends BaseHttpHandler {
     private final TaskManager taskManager;
 
-    public SubtasksHandler(TaskManager taskManager) {
+    public EpicsHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -21,22 +21,22 @@ public class SubtasksHandler extends BaseHttpHandler {
 
             switch (method) {
                 case "GET":
-                    if (pathParts.length == 3) { // /subtasks/{id}
-                        handleGetSubtaskById(exchange, pathParts[2]);
+                    if (pathParts.length == 3) { // /epics/{id}
+                        handleGetEpicById(exchange, pathParts[2]);
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "POST":
-                    if (pathParts.length == 2) { // /subtasks
-                        handleCreateOrUpdateSubtask(exchange);
+                    if (pathParts.length == 2) { // /epics
+                        handleCreateOrUpdateEpic(exchange);
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "DELETE":
-                    if (pathParts.length == 3) { // /subtasks/{id}
-                        handleDeleteSubtask(exchange, pathParts[2]);
+                    if (pathParts.length == 3) { // /epics/{id}
+                        handleDeleteEpic(exchange, pathParts[2]);
                     } else {
                         sendNotFound(exchange);
                     }
@@ -49,14 +49,14 @@ public class SubtasksHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleGetSubtaskById(HttpExchange exchange, String idStr) throws IOException {
+    private void handleGetEpicById(HttpExchange exchange, String idStr) throws IOException {
         try {
             int id = Integer.parseInt(idStr);
-            Subtask subtask = taskManager.getSubtask(id);
-            if (subtask == null) {
+            Epic epic = taskManager.getEpic(id);
+            if (epic == null) {
                 sendNotFound(exchange);
             } else {
-                String response = gson.toJson(subtask);
+                String response = gson.toJson(epic);
                 sendSuccess(exchange, response);
             }
         } catch (NumberFormatException e) {
@@ -64,31 +64,31 @@ public class SubtasksHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleCreateOrUpdateSubtask(HttpExchange exchange) throws IOException {
-        Subtask subtask = readRequest(exchange, Subtask.class);
-        if (subtask == null) {
+    private void handleCreateOrUpdateEpic(HttpExchange exchange) throws IOException {
+        Epic epic = readRequest(exchange, Epic.class);
+        if (epic == null) {
             sendNotFound(exchange);
             return;
         }
 
         try {
-            if (subtask.getId() == 0) { // New subtask
-                taskManager.addSubtask(subtask);
-                sendCreated(exchange, gson.toJson(subtask));
-            } else { // Update existing subtask
-                taskManager.addSubtask(subtask);
-                sendSuccess(exchange, gson.toJson(subtask));
+            if (epic.getId() == 0) { // New epic
+                taskManager.addEpic(epic);
+                sendCreated(exchange, gson.toJson(epic));
+            } else { // Update existing epic
+                taskManager.addEpic(epic);
+                sendSuccess(exchange, gson.toJson(epic));
             }
         } catch (Exception e) {
             sendHasInteractions(exchange);
         }
     }
 
-    private void handleDeleteSubtask(HttpExchange exchange, String idStr) throws IOException {
+    private void handleDeleteEpic(HttpExchange exchange, String idStr) throws IOException {
         try {
             int id = Integer.parseInt(idStr);
             taskManager.deleteTaskById(id);
-            sendSuccess(exchange, "Subtask deleted");
+            sendSuccess(exchange, "Epic deleted");
         } catch (NumberFormatException e) {
             sendNotFound(exchange);
         }
