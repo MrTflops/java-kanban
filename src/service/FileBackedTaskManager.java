@@ -1,4 +1,4 @@
-package main;
+package service;
 
 import model.Epic;
 import model.Status;

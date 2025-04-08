@@ -1,4 +1,4 @@
-package main;
+package service;
 
 import model.Epic;
 import model.Status;
@@ -78,10 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getAllTasks() {
-        List<Task> allTasks = new ArrayList<>(tasks.values());
-        allTasks.addAll(epics.values());
-        allTasks.addAll(subtasks.values());
-        return allTasks;
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
@@ -89,6 +86,40 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.clear();
         epics.clear();
         subtasks.clear();
+    }
+
+    @Override
+    public List<Epic> getAllEpics() {
+        return new ArrayList<>(epics.values());
+    }
+
+    @Override
+    public List<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtasks.values());
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        List<Task> prioritized = new ArrayList<>();
+        prioritized.addAll(tasks.values());
+        prioritized.addAll(subtasks.values());
+        prioritized.sort(Comparator.comparing(Task::getStartTime));
+        return prioritized;
+    }
+
+    @Override
+    public List<Subtask> getEpicSubtasks(int epicId) {
+        List<Subtask> result = new ArrayList<>();
+        Epic epic = epics.get(epicId);
+        if (epic != null) {
+            for (int subtaskId : epic.getSubtaskIds()) {
+                Subtask subtask = subtasks.get(subtaskId);
+                if (subtask != null) {
+                    result.add(subtask);
+                }
+            }
+        }
+        return result;
     }
 
     private void updateEpicStatus(Epic epic) {

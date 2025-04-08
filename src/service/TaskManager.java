@@ -1,4 +1,4 @@
-package main;
+package service;
 
 import model.Task;
 import model.Epic;
@@ -30,4 +30,13 @@ public interface TaskManager {
     List<Task> getAllTasks();
 
     void deleteAllTasks();
+
+    List<Epic> getAllEpics();
+
+    List<Subtask> getAllSubtasks();
+
+    List<Task> getPrioritizedTasks();
+
+    List<Subtask> getEpicSubtasks(int epicId);
+
 }

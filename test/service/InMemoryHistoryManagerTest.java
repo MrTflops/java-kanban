@@ -1,6 +1,6 @@
 package test.service;
 
-import main.InMemoryHistoryManager;
+import service.InMemoryHistoryManager;
 import model.Task;
 import model.Status;
 import org.junit.jupiter.api.Test;
