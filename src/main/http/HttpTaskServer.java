@@ -3,8 +3,6 @@ package main.http;
 import com.sun.net.httpserver.HttpServer;
 import main.TaskManager;
 import main.Managers;
-import main.http.handler.*;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -21,7 +19,6 @@ public class HttpTaskServer {
         this.taskManager = taskManager;
         this.httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        // Регистрируем обработчики
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
         httpServer.createContext("/epics", new EpicsHandler(taskManager));

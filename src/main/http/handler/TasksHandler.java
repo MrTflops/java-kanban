@@ -1,7 +1,7 @@
 package main.http.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import main.*;
+import main.TaskManager;
 import model.Task;
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +13,7 @@ public class TasksHandler extends BaseHttpHandler {
         this.taskManager = taskManager;
     }
 
-
+    @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             String method = exchange.getRequestMethod();
@@ -22,25 +22,25 @@ public class TasksHandler extends BaseHttpHandler {
 
             switch (method) {
                 case "GET":
-                    if (pathParts.length == 2) { // /tasks
+                    if (pathParts.length == 2) {
                         handleGetAllTasks(exchange);
-                    } else if (pathParts.length == 3) { // /tasks/{id}
+                    } else if (pathParts.length == 3) {
                         handleGetTaskById(exchange, pathParts[2]);
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "POST":
-                    if (pathParts.length == 2) { // /tasks
+                    if (pathParts.length == 2) {
                         handleCreateOrUpdateTask(exchange);
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "DELETE":
-                    if (pathParts.length == 3) { // /tasks/{id}
+                    if (pathParts.length == 3) {
                         handleDeleteTask(exchange, pathParts[2]);
-                    } else if (pathParts.length == 2) { // /tasks
+                    } else if (pathParts.length == 2) {
                         handleDeleteAllTasks(exchange);
                     } else {
                         sendNotFound(exchange);
@@ -83,11 +83,11 @@ public class TasksHandler extends BaseHttpHandler {
         }
 
         try {
-            if (task.getId() == 0) { // New task
+            if (task.getId() == 0) {
                 taskManager.addTask(task);
                 sendCreated(exchange, gson.toJson(task));
-            } else { // Update existing task
-                taskManager.addTask(task); // Предполагаем, что addTask также обновляет существующие
+            } else {
+                taskManager.addTask(task);
                 sendSuccess(exchange, gson.toJson(task));
             }
         } catch (Exception e) {
