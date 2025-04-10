@@ -1,59 +1,33 @@
 package main.http.handler;
 
-import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import main.TaskManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class BaseHttpHandler {
-    protected static final Gson gson = new Gson();
+public abstract class BaseHttpHandler implements HttpHandler {
+    protected final TaskManager taskManager;
+    protected final Gson gson = new Gson();
 
-    protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
-        byte[] response = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(statusCode, response.length);
+    protected BaseHttpHandler(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
+
+    protected void sendResponse(HttpExchange exchange, String response, int statusCode) throws IOException {
+        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(statusCode, responseBytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response);
+            os.write(responseBytes);
         }
     }
 
-    protected void sendSuccess(HttpExchange exchange, String text) throws IOException {
-        sendText(exchange, text, 200);
-    }
-
-    protected void sendCreated(HttpExchange exchange, String text) throws IOException {
-        sendText(exchange, text, 201);
-    }
-
-    protected void sendNotFound(HttpExchange exchange) throws IOException {
-        String response = "Not Found";
-        exchange.sendResponseHeaders(404, response.length());
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes());
+    protected String readRequestBody(HttpExchange exchange) throws IOException {
+        try (InputStream is = exchange.getRequestBody()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
-    }
-
-    protected void sendHasInteractions(HttpExchange exchange) throws IOException {
-        String response = "Task has time intersections with existing tasks";
-        exchange.sendResponseHeaders(406, response.length());
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes());
-        }
-    }
-
-    protected void sendInternalError(HttpExchange exchange) throws IOException {
-        String response = "Internal Server Error";
-        exchange.sendResponseHeaders(500, response.length());
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes());
-        }
-    }
-
-    protected <T> T readRequest(HttpExchange exchange, Class<T> classOfT) throws IOException {
-        InputStream inputStream = exchange.getRequestBody();
-        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        return gson.fromJson(body, classOfT);
     }
 }

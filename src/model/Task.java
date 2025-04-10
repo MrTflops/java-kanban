@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
-    private static int idCounter = 1;
     private int id;
     private String title;
     private String description;
@@ -14,82 +13,39 @@ public class Task {
     private Duration duration;
 
     public Task(String title, String description, Status status) {
-        this(title, description, status, null, null);
+        this.title = title;
+        this.description = description;
+        this.status = status;
     }
 
     public Task(String title, String description, Status status,
-                Duration duration, LocalDateTime startTime) {
-        this.id = idCounter++;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.duration = duration;
+                LocalDateTime startTime, Duration duration) {
+        this(title, description, status);
         this.startTime = startTime;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
+    // Геттеры и сеттеры
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public Duration getDuration() { return duration; }
+    public void setDuration(Duration duration) { this.duration = duration; }
     public LocalDateTime getEndTime() {
-        if (startTime != null && duration != null) {
-            return startTime.plus(duration);
-        }
-        return null;
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Task)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
         Task task = (Task) o;
         return id == task.id;
     }
@@ -97,5 +53,16 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", status=" + status +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
+                '}';
     }
 }

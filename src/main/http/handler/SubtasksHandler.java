@@ -4,15 +4,14 @@ import com.sun.net.httpserver.HttpExchange;
 import main.TaskManager;
 import model.Subtask;
 import java.io.IOException;
+import java.util.List;
 
 public class SubtasksHandler extends BaseHttpHandler {
-    private final TaskManager taskManager;
-
     public SubtasksHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
-
+    @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             String method = exchange.getRequestMethod();
@@ -21,76 +20,43 @@ public class SubtasksHandler extends BaseHttpHandler {
 
             switch (method) {
                 case "GET":
-                    if (pathParts.length == 3) { // /subtasks/{id}
-                        handleGetSubtaskById(exchange, pathParts[2]);
-                    } else {
-                        sendNotFound(exchange);
+                    if (pathParts.length == 2) {
+                        // GET /subtasks
+                        List<Subtask> subtasks = taskManager.getAllSubtasks();
+                        sendResponse(exchange, gson.toJson(subtasks), 200);
+                    } else if (pathParts.length == 3) {
+                        // GET /subtasks/{id}
+                        int id = Integer.parseInt(pathParts[2]);
+                        Subtask subtask = taskManager.getSubtask(id);
+                        if (subtask != null) {
+                            sendResponse(exchange, gson.toJson(subtask), 200);
+                        } else {
+                            sendResponse(exchange, "Подзадача не найдена", 404);
+                        }
                     }
                     break;
                 case "POST":
-                    if (pathParts.length == 2) { // /subtasks
-                        handleCreateOrUpdateSubtask(exchange);
-                    } else {
-                        sendNotFound(exchange);
-                    }
+                    // POST /subtasks
+                    String requestBody = readRequestBody(exchange);
+                    Subtask newSubtask = gson.fromJson(requestBody, Subtask.class);
+                    taskManager.addSubtask(newSubtask);
+                    sendResponse(exchange, gson.toJson(newSubtask), 201);
                     break;
                 case "DELETE":
-                    if (pathParts.length == 3) { // /subtasks/{id}
-                        handleDeleteSubtask(exchange, pathParts[2]);
-                    } else {
-                        sendNotFound(exchange);
+                    if (pathParts.length == 3) {
+                        // DELETE /subtasks/{id}
+                        int id = Integer.parseInt(pathParts[2]);
+                        taskManager.deleteSubtask(id);
+                        sendResponse(exchange, "Подзадача удалена", 200);
                     }
                     break;
                 default:
-                    sendNotFound(exchange);
-            }
-        } catch (Exception e) {
-            sendInternalError(exchange);
-        }
-    }
-
-    private void handleGetSubtaskById(HttpExchange exchange, String idStr) throws IOException {
-        try {
-            int id = Integer.parseInt(idStr);
-            Subtask subtask = taskManager.getSubtask(id);
-            if (subtask == null) {
-                sendNotFound(exchange);
-            } else {
-                String response = gson.toJson(subtask);
-                sendSuccess(exchange, response);
+                    sendResponse(exchange, "Метод не поддерживается", 405);
             }
         } catch (NumberFormatException e) {
-            sendNotFound(exchange);
-        }
-    }
-
-    private void handleCreateOrUpdateSubtask(HttpExchange exchange) throws IOException {
-        Subtask subtask = readRequest(exchange, Subtask.class);
-        if (subtask == null) {
-            sendNotFound(exchange);
-            return;
-        }
-
-        try {
-            if (subtask.getId() == 0) { // New subtask
-                taskManager.addSubtask(subtask);
-                sendCreated(exchange, gson.toJson(subtask));
-            } else { // Update existing subtask
-                taskManager.addSubtask(subtask);
-                sendSuccess(exchange, gson.toJson(subtask));
-            }
+            sendResponse(exchange, "Некорректный ID", 400);
         } catch (Exception e) {
-            sendHasInteractions(exchange);
-        }
-    }
-
-    private void handleDeleteSubtask(HttpExchange exchange, String idStr) throws IOException {
-        try {
-            int id = Integer.parseInt(idStr);
-            taskManager.deleteTaskById(id);
-            sendSuccess(exchange, "Subtask deleted");
-        } catch (NumberFormatException e) {
-            sendNotFound(exchange);
+            sendResponse(exchange, "Внутренняя ошибка сервера", 500);
         }
     }
 }

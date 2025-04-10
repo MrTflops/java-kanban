@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +27,18 @@ public class Epic extends Task {
 
     public void clearSubtaskIds() {
         subtaskIds.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "id=" + getId() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
+                ", subtaskIds=" + subtaskIds +
+                ", startTime=" + getStartTime() +
+                ", duration=" + getDuration() +
+                '}';
     }
 }

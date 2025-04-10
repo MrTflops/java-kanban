@@ -7,28 +7,22 @@ import java.io.IOException;
 import java.util.List;
 
 public class PrioritizedHandler extends BaseHttpHandler {
-    private final TaskManager taskManager;
-
     public PrioritizedHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
-
+    @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             if ("GET".equals(exchange.getRequestMethod())) {
-                handleGetPrioritizedTasks(exchange);
+                // GET /prioritized
+                List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+                sendResponse(exchange, gson.toJson(prioritizedTasks), 200);
             } else {
-                sendNotFound(exchange);
+                sendResponse(exchange, "Метод не поддерживается", 405);
             }
         } catch (Exception e) {
-            sendInternalError(exchange);
+            sendResponse(exchange, "Внутренняя ошибка сервера", 500);
         }
-    }
-
-    private void handleGetPrioritizedTasks(HttpExchange exchange) throws IOException {
-        List<Task> tasks = taskManager.getAllTasks(); // В текущей реализации нет приоритетов, используем все задачи
-        String response = gson.toJson(tasks);
-        sendSuccess(exchange, response);
     }
 }

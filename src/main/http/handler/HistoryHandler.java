@@ -7,28 +7,22 @@ import java.io.IOException;
 import java.util.List;
 
 public class HistoryHandler extends BaseHttpHandler {
-    private final TaskManager taskManager;
-
     public HistoryHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
-
+    @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
             if ("GET".equals(exchange.getRequestMethod())) {
-                handleGetHistory(exchange);
+                // GET /history
+                List<Task> history = taskManager.getHistory();
+                sendResponse(exchange, gson.toJson(history), 200);
             } else {
-                sendNotFound(exchange);
+                sendResponse(exchange, "Метод не поддерживается", 405);
             }
         } catch (Exception e) {
-            sendInternalError(exchange);
+            sendResponse(exchange, "Внутренняя ошибка сервера", 500);
         }
-    }
-
-    private void handleGetHistory(HttpExchange exchange) throws IOException {
-        List<Task> history = taskManager.getHistory();
-        String response = gson.toJson(history);
-        sendSuccess(exchange, response);
     }
 }
