@@ -1,18 +1,16 @@
 package service;
 
 import main.InMemoryTaskManager;
-import model.*;
+import model.Status;
+import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
-    @Override
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         manager = new InMemoryTaskManager();
     }
 

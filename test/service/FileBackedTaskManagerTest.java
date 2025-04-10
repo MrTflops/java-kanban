@@ -1,22 +1,20 @@
 package service;
 
 import main.FileBackedTaskManager;
-import model.*;
+import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File file;
 
-    @Override
     @BeforeEach
-    void setUp() throws IOException {
+    public void setUp() throws IOException {
         file = File.createTempFile("tasks", ".csv");
         manager = new FileBackedTaskManager(file);
     }

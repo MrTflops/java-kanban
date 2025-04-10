@@ -3,14 +3,18 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import main.TaskManager;
+import model.Status;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.io.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class TasksHandlerTest {
