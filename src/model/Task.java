@@ -26,29 +26,53 @@ public class Task {
     }
 
     // Геттеры и сеттеры
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
-    public void setId(int id) { this.id = id; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public Status getStatus() { return status; }
+    public Status getStatus() {
+        return status;
+    }
 
-    public void setStatus(Status status) { this.status = status; }
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
-    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
 
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
 
-    public Duration getDuration() { return duration; }
+    public Duration getDuration() {
+        return duration;
+    }
 
-    public void setDuration(Duration duration) { this.duration = duration; }
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
 
     public LocalDateTime getEndTime() {
         return startTime != null && duration != null ? startTime.plus(duration) : null;
