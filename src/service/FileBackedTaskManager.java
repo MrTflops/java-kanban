@@ -1,4 +1,4 @@
-package main;
+package service;
 
 import model.*;
 
@@ -160,7 +160,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при загрузке из файла", e);
+            throw new ManagerSaveException(String.format("Ошибка ввода-вывода при работе с файлом %s", file.getName()),
+                    e
+            );
         }
 
         return manager;

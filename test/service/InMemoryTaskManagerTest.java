@@ -1,6 +1,6 @@
 package test.service;
 
-import main.InMemoryTaskManager;
+import service.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
