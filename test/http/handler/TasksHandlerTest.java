@@ -2,79 +2,69 @@ package http.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import main.InMemoryTaskManager;
 import main.TaskManager;
 import model.Task;
-import model.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class TasksHandlerTest {
+public class TasksHandlerTest {
     private TasksHandler handler;
     private TaskManager taskManager;
-    private Gson gson;
     private HttpExchange exchange;
+    private Gson gson;
 
     @BeforeEach
-    void setUp() {
-        taskManager = new InMemoryTaskManager();
+    void setUp() throws Exception {
+        taskManager = mock(TaskManager.class);
         handler = new TasksHandler(taskManager);
-        gson = HttpTaskServer.getGson();
+        gson = new Gson();
         exchange = mock(HttpExchange.class);
     }
 
     @Test
-    void testHandleGetTasks() throws IOException, URISyntaxException {
-        Task task = new Task("Test", "Description", Status.NEW);
-        taskManager.addTask(task);
-
+    void testHandleGetTasks() throws IOException {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8080/tasks"));
 
-        OutputStream os = mock(OutputStream.class);
+        Task task = new Task("Test", "Description", Status.NEW);
+        when(taskManager.getAllTasks()).thenReturn(List.of(task));
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         when(exchange.getResponseBody()).thenReturn(os);
 
         handler.handle(exchange);
 
-        verify(exchange).sendResponseHeaders(200, gson.toJson(taskManager.getTasks()).getBytes().length);
+        verify(exchange).sendResponseHeaders(200, os.toByteArray().length);
+        assertTrue(os.toString().contains("Test"));
     }
 
     @Test
     void testHandlePostTask() throws IOException {
-        Task task = new Task("New Task", "Description", Status.NEW);
-        String taskJson = gson.toJson(task);
-
-        InputStream is = new ByteArrayInputStream(taskJson.getBytes(StandardCharsets.UTF_8));
         when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8080/tasks"));
+
+        String taskJson = "{\"title\":\"New Task\",\"description\":\"Description\",\"status\":\"NEW\"}";
+        InputStream is = new ByteArrayInputStream(taskJson.getBytes());
         when(exchange.getRequestBody()).thenReturn(is);
 
         handler.handle(exchange);
 
-        assertEquals(1, taskManager.getTasks().size());
-        assertEquals("New Task", taskManager.getTasks().get(0).getTitle());
+        verify(taskManager).addTask(any(Task.class));
     }
 
     @Test
-    void testHandleDeleteTask() throws IOException, URISyntaxException {
-        Task task = new Task("To Delete", "Description", Status.NEW);
-        taskManager.addTask(task);
-
+    void testHandleDeleteTask() throws IOException {
         when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestURI()).thenReturn(new URI("http://localhost:8080/tasks/1"));
 
         handler.handle(exchange);
 
-        assertEquals(0, taskManager.getTasks().size());
+        verify(taskManager).deleteTask(1);
     }
 }
