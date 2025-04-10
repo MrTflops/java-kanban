@@ -1,58 +1,53 @@
-package main;
+package http.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import main.http.HttpTaskServer;
+import http.HttpTaskServer;
+import main.TaskManager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public abstract class BaseHttpHandler implements HttpHandler {
+abstract class BaseHttpHandler implements HttpHandler {
     protected final TaskManager taskManager;
     protected final Gson gson;
+    static final int NUM_PARTS_IN_PATH_WITH_ID = 3;
 
-    protected BaseHttpHandler(TaskManager taskManager) {
+    BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = HttpTaskServer.getGson();
+        gson = HttpTaskServer.getGson();
     }
 
-    protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
+    protected String readText(HttpExchange exchange) throws IOException {
+        return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    protected void sendText(HttpExchange exchange, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(statusCode, resp.length);
+        exchange.sendResponseHeaders(200, resp.length);
         exchange.getResponseBody().write(resp);
         exchange.close();
     }
 
-    protected void sendSuccess(HttpExchange exchange, String response) throws IOException {
-        sendText(exchange, response, 200);
-    }
-
-    protected void sendCreated(HttpExchange exchange, String response) throws IOException {
-        sendText(exchange, response, 201);
-    }
-
     protected void sendNotFound(HttpExchange exchange) throws IOException {
-        sendText(exchange, "Задача не найдена", 404);
+        exchange.sendResponseHeaders(404, 0);
+        exchange.close();
     }
 
-    protected void sendNotAcceptable(HttpExchange exchange, String message) throws IOException {
-        sendText(exchange, message, 406);
+    protected void sendHasInteractions(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(406, 0);
+        exchange.getResponseBody().write("Есть пересечение с текущими задачами".getBytes(StandardCharsets.UTF_8));
+        exchange.close();
     }
 
-    protected void sendInternalError(HttpExchange exchange) throws IOException {
-        sendText(exchange, "Внутренняя ошибка сервера", 500);
-    }
-
-    protected String readRequestBody(HttpExchange exchange) throws IOException {
-        try (InputStream inputStream = exchange.getRequestBody()) {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+    protected Integer getIdFromPath(String path) {
+        final String[] urlSplited = path.split("/");
+        int id = 0;
+        if (urlSplited.length >= NUM_PARTS_IN_PATH_WITH_ID) {
+            id = Integer.parseInt(urlSplited[NUM_PARTS_IN_PATH_WITH_ID - 1]);
         }
-    }
-
-    protected <T> T parseRequestBody(String body, Class<T> clazz) {
-        return gson.fromJson(body, clazz);
+        return id;
     }
 }

@@ -1,4 +1,4 @@
-package main.http.adapter;
+package http.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -10,16 +10,21 @@ import java.time.Duration;
 public class DurationAdapter extends TypeAdapter<Duration> {
 
     @Override
-    public void write(JsonWriter out, Duration value) throws IOException {
-        if (value != null) {
-            out.value(value.toMinutes());
+    public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
+        if (duration == null || duration.equals(Duration.ZERO)) {
+            jsonWriter.value(0);
         } else {
-            out.nullValue();
+            jsonWriter.value(duration.toMinutes());
         }
     }
 
     @Override
-    public Duration read(JsonReader in) throws IOException {
-        return Duration.ofMinutes(in.nextLong());
+    public Duration read(JsonReader jsonReader) throws IOException {
+        long minutes = jsonReader.nextLong();
+        if (minutes == 0) {
+            return Duration.ZERO;
+        } else {
+            return Duration.ofMinutes(minutes);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package test.http;
 
-import main.http.HttpTaskServer;
+import http.HttpTaskServer;
 import main.TaskManager;
 import main.Managers;
 import model.Task;
