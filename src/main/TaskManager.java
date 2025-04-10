@@ -30,9 +30,13 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
+    List<Subtask> getSubtaskListByEpicId(int epicId);
+    // Добавлен новый метод
     List<Subtask> getEpicSubtasks(int epicId);
 
     // Методы для эпиков
+    List<Epic> getEpicList();
+    // Добавлен новый метод
     List<Epic> getAllEpics();
 
     Epic getEpic(int id);
@@ -43,6 +47,8 @@ public interface TaskManager {
 
     void deleteEpic(int id);
 
+    void deleteEpicById(int id);
+    // Добавлен новый метод
     void deleteAllEpics();
 
     // Общие методы
