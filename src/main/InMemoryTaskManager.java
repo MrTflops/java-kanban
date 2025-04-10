@@ -251,7 +251,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void updateEpicStatus(Epic epic) {
+    protected void updateEpicStatus(Epic epic) {
         if (epic == null) return;
         List<Subtask> subtasks = getEpicSubtasks(epic.getId());
 
@@ -273,7 +273,7 @@ public class InMemoryTaskManager implements TaskManager {
         else epic.setStatus(Status.IN_PROGRESS);
     }
 
-    private void updateEpicTimes(Epic epic) {
+    protected void updateEpicTimes(Epic epic) {
         if (epic == null) return;
         List<Subtask> subtasks = getEpicSubtasks(epic.getId());
 

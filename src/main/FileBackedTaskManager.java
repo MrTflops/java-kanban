@@ -10,7 +10,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String HEADER = "id,type,name,status,description,duration,startTime,endTime,epicId";
 
     public FileBackedTaskManager(File file) {
-        super(); // Вызываем конструктор родительского класса
+        super();
         this.file = file;
     }
 
@@ -51,8 +51,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 } else if (task instanceof Subtask) {
                     Subtask subtask = (Subtask) task;
                     manager.subtasks.put(subtask.getId(), subtask);
-
-
                     Epic epic = manager.epics.get(subtask.getEpicId());
                     if (epic != null) {
                         epic.addSubtaskId(subtask.getId());
@@ -61,12 +59,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     manager.tasks.put(task.getId(), task);
                 }
 
-
                 if (task.getId() >= manager.nextId) {
                     manager.nextId = task.getId() + 1;
                 }
             }
-
 
             for (Epic epic : manager.epics.values()) {
                 manager.updateEpicStatus(epic);
@@ -79,6 +75,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         return manager;
     }
+
 
 
     private String toString(Task task) {
