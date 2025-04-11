@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpPrincipal;
 import main.TaskManager;
 import model.Status;
 import model.Task;
@@ -209,7 +210,9 @@ public class TasksHandlerTest {
         public void setStreams(InputStream i, OutputStream o) {}
 
         @Override
-        public Principal getPrincipal() { return null; }
+        public HttpPrincipal getPrincipal() {
+            return new HttpPrincipal("user", "realm");
+        }
 
         public int getResponseCode() {
             return responseCode;
