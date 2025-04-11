@@ -10,10 +10,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
-    @BeforeEach
-    public void setUp() {
+
+    @Override
+    protected void initManager() {
         manager = new InMemoryTaskManager();
     }
+
+    @BeforeEach
+    public void setUp() {
+        initManager();
 
     @Test
     void testGetTask() {
