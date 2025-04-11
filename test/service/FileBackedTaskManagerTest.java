@@ -6,24 +6,24 @@ import model.Status;
 import model.Task;
 import model.TaskManagerTest;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File file;
 
-    @BeforeEach
-    public void setUp() {
+    @Override
+    protected void initManager() {
         try {
-            file = File.createTempFile("test_tasks", ".csv");
+            file = Files.createTempFile("test", ".csv").toFile();
             manager = new FileBackedTaskManager(file);
-        } catch (Exception e) {
-            fail("Failed to create temp file", e);
+        } catch (IOException e) {
+            fail("Ошибка при создании временного файла", e);
         }
     }
 

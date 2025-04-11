@@ -1,5 +1,7 @@
 package model;
 
+import main.ManagerSaveException;
+import main.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -10,7 +12,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T manager;
 
-    protected abstract void setUp();
+    protected abstract void initManager();
+
+    @BeforeEach
+    void setUp() {
+        initManager();
+    }
 
     @Test
     void testPrioritizedTasks() {
