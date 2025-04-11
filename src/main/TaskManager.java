@@ -1,22 +1,58 @@
 package main;
 
-import model.Task;
-import model.Epic;
-import model.Subtask;
-
+import model.*;
 import java.util.List;
 
 public interface TaskManager {
-    Task getTask(int id);        // Получить задачу по ID
-    Epic getEpic(int id);        // Получить эпик по ID
-    Subtask getSubtask(int id);  // Получить подзадачу по ID
-    List<Task> getHistory();     // Получить историю просмотров
+    // Методы для задач
+    List<Task> getAllTasks();
 
-    void addTask(Task task);           // Добавить задачу
-    void addEpic(Epic epic);           // Добавить эпик
-    void addSubtask(Subtask subtask);  // Добавить подзадачу
+    Task getTask(int id);
 
-    void deleteTaskById(int id);       // Удалить задачу по ID
-    List<Task> getAllTasks();          // Получить все задачи
-    void deleteAllTasks();             // Удалить все задачи
+    void addTask(Task task);
+
+    void updateTask(Task task);
+
+    void deleteTask(int id);
+
+    void deleteAllTasks();
+
+    // Методы для подзадач
+    List<Subtask> getAllSubtasks();
+
+    Subtask getSubtask(int id);
+
+    void addSubtask(Subtask subtask);
+
+    void updateSubtask(Subtask subtask);
+
+    void deleteSubtask(int id);
+
+    void deleteAllSubtasks();
+
+    List<Subtask> getSubtaskListByEpicId(int epicId);
+
+    List<Subtask> getEpicSubtasks(int epicId);
+
+    // Методы для эпиков
+    List<Epic> getEpicList();
+
+    List<Epic> getAllEpics();
+
+    Epic getEpic(int id);
+
+    void addEpic(Epic epic);
+
+    void updateEpic(Epic epic);
+
+    void deleteEpic(int id);
+
+    void deleteEpicById(int id);
+
+    void deleteAllEpics();
+
+    // Общие методы
+    List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }
