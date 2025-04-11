@@ -14,18 +14,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
+    // Метод для сохранения всех данных в файл
     private void save() {
         try (Writer writer = new FileWriter(file)) {
             writer.write(HEADER + "\n"); // Записываем заголовок
 
+            // Записываем задачи
             for (Task task : tasks.values()) {
                 writer.write(toString(task) + "\n");
             }
 
+            // Записываем эпики
             for (Epic epic : epics.values()) {
                 writer.write(toString(epic) + "\n");
             }
 
+            // Записываем подзадачи
             for (Subtask subtask : subtasks.values()) {
                 writer.write(toString(subtask) + "\n");
             }
@@ -34,11 +38,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    // Метод для загрузки данных из файла
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            reader.readLine();
+            reader.readLine(); // Пропускаем заголовок
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -46,6 +51,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                 Task task = fromString(line);
 
+                // Заполняем данные в соответствующие структуры
                 if (task instanceof Epic) {
                     manager.epics.put(task.getId(), (Epic) task);
                 } else if (task instanceof Subtask) {
@@ -64,6 +70,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
 
+            // Обновляем статусы и время для эпиков
             for (Epic epic : manager.epics.values()) {
                 manager.updateEpicStatus(epic);
                 manager.updateEpicTimes(epic);
@@ -76,8 +83,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return manager;
     }
 
-
-
+    // Преобразуем задачу в строку для записи в файл
     private String toString(Task task) {
         StringBuilder sb = new StringBuilder();
         sb.append(task.getId()).append(",")
@@ -89,7 +95,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 .append(task.getStartTime()).append(",")
                 .append(task.getEndTime());
 
-
         if (task instanceof Subtask) {
             sb.append(",").append(((Subtask) task).getEpicId());
         } else {
@@ -99,14 +104,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return sb.toString();
     }
 
-
+    // Получаем тип задачи для записи
     private static Type getType(Task task) {
         if (task instanceof Epic) return Type.EPIC;
         if (task instanceof Subtask) return Type.SUBTASK;
         return Type.TASK;
     }
 
-
+    // Преобразуем строку в объект задачи
     private static Task fromString(String value) {
         String[] parts = value.split(",");
         int id = Integer.parseInt(parts[0]);
@@ -118,7 +123,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         LocalDateTime startTime = parts[6].isEmpty() ? null : LocalDateTime.parse(parts[6]);
         LocalDateTime endTime = parts[7].isEmpty() ? null : LocalDateTime.parse(parts[7]);
         int epicId = parts.length > 8 && !parts[8].isEmpty() ? Integer.parseInt(parts[8]) : 0;
-
 
         switch (type) {
             case TASK:
@@ -141,12 +145,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-
-
+    // Переопределение методов для добавления, обновления и удаления задач
     @Override
     public void addTask(Task task) {
         super.addTask(task);
-        save();
+        save(); // Сохраняем после каждого изменения
     }
 
     @Override

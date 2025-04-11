@@ -39,7 +39,9 @@ public class Task {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        if (title != null) {
+            this.title = title;
+        }
     }
 
     public String getDescription() {
@@ -47,7 +49,9 @@ public class Task {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public Status getStatus() {
@@ -55,7 +59,9 @@ public class Task {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        if (status != null) {
+            this.status = status;
+        }
     }
 
     public LocalDateTime getStartTime() {
