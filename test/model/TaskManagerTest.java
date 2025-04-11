@@ -1,23 +1,17 @@
 package model;
 
-import main.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T manager;
 
-    // Метод для инициализации тестов
-    @BeforeEach
     protected abstract void setUp();
 
-    // Тест на проверку приоритета задач
     @Test
     void testPrioritizedTasks() {
         Task task1 = new Task("Task 1", "Description", Status.NEW,
@@ -33,7 +27,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals("Task 2", prioritized.get(0).getTitle());
     }
 
-    // Тест на проверку наложения задач
     @Test
     void testTaskOverlapping() {
         Task task = new Task("Task", "Description", Status.NEW,
