@@ -10,15 +10,17 @@ public class Epic extends Task {
         super(title, description, Status.NEW);
     }
 
-    public List<Integer> getSubtaskIds() {
-        return subtaskIds;
-    }
-
-    public void addSubtaskId(int subtaskId) {
+        public boolean addSubtaskId(int subtaskId) {
+        if (subtaskId == this.id || subtaskId <= 0) {
+            return false;
+        }
         if (!subtaskIds.contains(subtaskId)) {
             subtaskIds.add(subtaskId);
+            return true;
         }
+        return false;
     }
+
 
     public void removeSubtaskId(int subtaskId) {
         subtaskIds.remove((Integer) subtaskId);

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
+    private static int idCounter = 1;
     private int id;
     private String title;
     private String description;
@@ -13,6 +14,7 @@ public class Task {
     private Duration duration;
 
     public Task(String title, String description, Status status) {
+        this.id = idCounter++;
         this.title = title;
         this.description = description;
         this.status = status;
@@ -23,6 +25,10 @@ public class Task {
         this(title, description, status);
         this.startTime = startTime;
         this.duration = duration;
+    }
+
+    public static void resetIdCounter() {
+        idCounter = 1;
     }
 
     // Геттеры и сеттеры

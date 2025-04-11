@@ -8,13 +8,21 @@ public class Subtask extends Task {
 
     public Subtask(String title, String description, Status status, int epicId) {
         super(title, description, status);
+        validateEpicId(epicId);
         this.epicId = epicId;
     }
 
     public Subtask(String title, String description, Status status,
                    int epicId, LocalDateTime startTime, Duration duration) {
         super(title, description, status, startTime, duration);
+        validateEpicId(epicId);
         this.epicId = epicId;
+    }
+
+    private void validateEpicId(int epicId) {
+        if (epicId <= 0) {
+            throw new IllegalArgumentException("Epic ID must be positive");
+        }
     }
 
     public int getEpicId() {

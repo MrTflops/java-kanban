@@ -3,7 +3,6 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import http.HttpTaskServer;
 import main.TaskManager;
 
 import java.io.IOException;
@@ -13,56 +12,50 @@ import java.nio.charset.StandardCharsets;
 abstract class BaseHttpHandler implements HttpHandler {
     protected final TaskManager taskManager;
     protected final Gson gson;
-    static final int NUM_PARTS_IN_PATH_WITH_ID = 3;
+    protected static final int NUM_PARTS_IN_PATH_WITH_ID = 3;
 
-    BaseHttpHandler(TaskManager taskManager) {
+    protected BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        gson = HttpTaskServer.getGson();
+        this.gson = new Gson();
     }
 
     protected String readText(HttpExchange exchange) throws IOException {
-        return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-    }
-
-    protected String readRequestBody(HttpExchange exchange) throws IOException {
-        try (InputStream inputStream = exchange.getRequestBody()) {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        try (InputStream is = exchange.getRequestBody()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
     protected void sendText(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        sendResponse(exchange, text, 200);
     }
 
     protected void sendResponse(HttpExchange exchange, String text, int code) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        byte[] response = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(code, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        exchange.sendResponseHeaders(code, response.length);
+        exchange.getResponseBody().write(response);
     }
 
     protected void sendNotFound(HttpExchange exchange) throws IOException {
-        exchange.sendResponseHeaders(404, 0);
-        exchange.close();
+        exchange.sendResponseHeaders(404, -1);
     }
 
     protected void sendHasInteractions(HttpExchange exchange) throws IOException {
-        exchange.sendResponseHeaders(406, 0);
-        exchange.getResponseBody().write("Есть пересечение с текущими задачами".getBytes(StandardCharsets.UTF_8));
-        exchange.close();
+        String response = "Есть пересечение с текущими задачами";
+        byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(406, bytes.length);
+        exchange.getResponseBody().write(bytes);
     }
 
     protected Integer getIdFromPath(String path) {
-        final String[] urlSplited = path.split("/");
-        int id = 0;
-        if (urlSplited.length >= NUM_PARTS_IN_PATH_WITH_ID) {
-            id = Integer.parseInt(urlSplited[NUM_PARTS_IN_PATH_WITH_ID - 1]);
+        String[] parts = path.split("/");
+        try {
+            if (parts.length >= NUM_PARTS_IN_PATH_WITH_ID) {
+                return Integer.parseInt(parts[NUM_PARTS_IN_PATH_WITH_ID - 1]);
+            }
+        } catch (NumberFormatException e) {
+            return null;
         }
-        return id;
+        return null;
     }
 }
