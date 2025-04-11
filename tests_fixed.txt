@@ -1,3 +1,5 @@
+./test/http/HttpTaskServerTest.java
+./test/http/handler/TasksHandlerTest.java
 ./test/model/EpicTest.java
 ./test/model/SubtaskTest.java
 ./test/model/TaskTest.java
