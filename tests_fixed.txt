@@ -2,6 +2,7 @@
 ./test/http/handler/TasksHandlerTest.java
 ./test/model/EpicTest.java
 ./test/model/SubtaskTest.java
+./test/model/TaskManagerTest.java
 ./test/model/TaskTest.java
 ./test/service/InMemoryHistoryManagerTest.java
 ./test/service/FileBackedTaskManagerTest.java
