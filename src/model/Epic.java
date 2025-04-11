@@ -1,5 +1,7 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +12,12 @@ public class Epic extends Task {
         super(title, description, Status.NEW);
     }
 
-        public boolean addSubtaskId(int subtaskId) {
-        if (subtaskId == this.id || subtaskId <= 0) {
+    public List<Integer> getSubtaskIds() {
+        return new ArrayList<>(subtaskIds);
+    }
+
+    public boolean addSubtaskId(int subtaskId) {
+        if (subtaskId == getId() || subtaskId <= 0) {  // Используем getter вместо прямого доступа к id
             return false;
         }
         if (!subtaskIds.contains(subtaskId)) {
@@ -20,7 +26,6 @@ public class Epic extends Task {
         }
         return false;
     }
-
 
     public void removeSubtaskId(int subtaskId) {
         subtaskIds.remove((Integer) subtaskId);
