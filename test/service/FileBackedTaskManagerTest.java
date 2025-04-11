@@ -17,7 +17,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File file;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         file = File.createTempFile("tasks", ".csv");
         manager = new FileBackedTaskManager(file);
     }
