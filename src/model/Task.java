@@ -42,8 +42,16 @@ public class Task {
         return title;
     }
 
+    public void setTitle(String title) {  // ✅ ДОБАВЛЕНО
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {  // ✅ ДОБАВЛЕНО
+        this.description = description;
     }
 
     public Status getStatus() {
@@ -68,6 +76,13 @@ public class Task {
 
     public void setDuration(Duration duration) {
         this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {  // ✅ ДОБАВЛЕНО
+        if (startTime != null && duration != null) {
+            return startTime.plus(duration);
+        }
+        return null;
     }
 
     @Override
