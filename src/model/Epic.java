@@ -1,12 +1,13 @@
 package model;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Integer> subtaskIds = new ArrayList<>();
 
-    public Epic(String title, String description) {
+    public Epic(@SerializedName("name") String title, String description) {
         super(title, description, Status.NEW);
     }
 
@@ -15,7 +16,7 @@ public class Epic extends Task {
     }
 
     public boolean addSubtaskId(int subtaskId) {
-        if (subtaskId == getId() || subtaskId <= 0) {  // Используем getter вместо прямого доступа к id
+        if (subtaskId == getId() || subtaskId <= 0) {
             return false;
         }
         if (!subtaskIds.contains(subtaskId)) {

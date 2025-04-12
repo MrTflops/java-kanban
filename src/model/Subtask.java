@@ -1,18 +1,19 @@
 package model;
 
+import com.google.gson.annotations.SerializedName;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Subtask extends Task {
     private final int epicId;
 
-    public Subtask(String title, String description, Status status, int epicId) {
+    public Subtask(@SerializedName("name") String title, String description, Status status, int epicId) {
         super(title, description, status);
         validateEpicId(epicId);
         this.epicId = epicId;
     }
 
-    public Subtask(String title, String description, Status status,
+    public Subtask(@SerializedName("name") String title, String description, Status status,
                    int epicId, LocalDateTime startTime, Duration duration) {
         super(title, description, status, startTime, duration);
         validateEpicId(epicId);

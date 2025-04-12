@@ -1,5 +1,6 @@
 package model;
 
+import com.google.gson.annotations.SerializedName;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -7,6 +8,8 @@ import java.util.Objects;
 public class Task {
     private static int idCounter = 1;
     private int id;
+
+    @SerializedName("name")
     private String title;
     private String description;
     private Status status;
@@ -31,7 +34,6 @@ public class Task {
         idCounter = 1;
     }
 
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }
