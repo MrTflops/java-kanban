@@ -1,13 +1,12 @@
 package model;
 
-import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Integer> subtaskIds = new ArrayList<>();
 
-    public Epic(@SerializedName("name") String title, String description) {
+    public Epic(String title, String description) {
         super(title, description, Status.NEW);
     }
 
