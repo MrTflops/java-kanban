@@ -3,7 +3,6 @@ package http.handler;
 import com.sun.net.httpserver.HttpExchange;
 import main.TaskManager;
 import model.Task;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -49,6 +48,7 @@ public class TasksHandler extends BaseHttpHandler {
         Task task = gson.fromJson(body, Task.class);
 
         if (task.getId() == 0) {
+            task.setId(taskManager.generateUniqueId());
             taskManager.addTask(task);
             sendResponse(exchange, gson.toJson(task), 201);
         } else {
@@ -65,6 +65,4 @@ public class TasksHandler extends BaseHttpHandler {
         }
 
         taskManager.deleteTask(id);
-        sendResponse(exchange, "", 200);
-    }
-}
+        sendResponse(exchange,

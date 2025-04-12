@@ -1,16 +1,11 @@
 package model;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class Task {
+public abstract class Task {
     private int id;
-
-    @SerializedName("name")
     private String title;
-
     private String description;
     private Status status;
     private LocalDateTime startTime;
@@ -42,7 +37,7 @@ public class Task {
         return title;
     }
 
-    public void setTitle(String title) {  // ✅ ДОБАВЛЕНО
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -50,7 +45,7 @@ public class Task {
         return description;
     }
 
-    public void setDescription(String description) {  // ✅ ДОБАВЛЕНО
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -78,11 +73,11 @@ public class Task {
         this.duration = duration;
     }
 
-    public LocalDateTime getEndTime() {  // ✅ ДОБАВЛЕНО
-        if (startTime != null && duration != null) {
-            return startTime.plus(duration);
+    public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
         }
-        return null;
+        return startTime.plus(duration);
     }
 
     @Override
