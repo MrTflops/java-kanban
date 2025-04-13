@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import main.TaskManager;
+import http.HttpTaskServer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +17,7 @@ abstract class BaseHttpHandler implements HttpHandler {
 
     protected BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new Gson();
+        this.gson = HttpTaskServer.getGson();
     }
 
     protected String readText(HttpExchange exchange) throws IOException {
