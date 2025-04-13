@@ -2,8 +2,10 @@ package model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-public abstract class Task {
+public class Task {
+    private static int idCounter = 1;
     private int id;
     private String title;
     private String description;
@@ -12,19 +14,24 @@ public abstract class Task {
     private Duration duration;
 
     public Task(String title, String description, Status status) {
+        this.id = idCounter++;
         this.title = title;
         this.description = description;
         this.status = status;
     }
 
-    public Task(String title, String description, Status status, LocalDateTime startTime, Duration duration) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
+    public Task(String title, String description, Status status,
+                LocalDateTime startTime, Duration duration) {
+        this(title, description, status);
         this.startTime = startTime;
         this.duration = duration;
     }
 
+    public static void resetIdCounter() {
+        idCounter = 1;
+    }
+
+    // Геттеры и сеттеры
     public int getId() {
         return id;
     }
@@ -38,7 +45,9 @@ public abstract class Task {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        if (title != null) {
+            this.title = title;
+        }
     }
 
     public String getDescription() {
@@ -46,7 +55,9 @@ public abstract class Task {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public Status getStatus() {
@@ -54,7 +65,9 @@ public abstract class Task {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        if (status != null) {
+            this.status = status;
+        }
     }
 
     public LocalDateTime getStartTime() {
@@ -74,10 +87,20 @@ public abstract class Task {
     }
 
     public LocalDateTime getEndTime() {
-        if (startTime == null || duration == null) {
-            return null;
-        }
-        return startTime.plus(duration);
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return id == task.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
@@ -85,7 +108,6 @@ public abstract class Task {
         return "Task{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
                 ", status=" + status +
                 ", startTime=" + startTime +
                 ", duration=" + duration +

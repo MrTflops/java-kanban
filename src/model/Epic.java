@@ -15,7 +15,7 @@ public class Epic extends Task {
     }
 
     public boolean addSubtaskId(int subtaskId) {
-        if (subtaskId == getId() || subtaskId <= 0) {
+        if (subtaskId == getId() || subtaskId <= 0) {  // Используем getter вместо прямого доступа к id
             return false;
         }
         if (!subtaskIds.contains(subtaskId)) {
