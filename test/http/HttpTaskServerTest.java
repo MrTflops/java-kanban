@@ -1,12 +1,8 @@
 package http;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import http.adapter.DurationAdapter;
-import http.adapter.LocalDateTimeAdapter;
-import main.Managers;
+import main.HttpTaskServer;
 import main.TaskManager;
-import model.Status;
 import model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,26 +13,22 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class HttpTaskServerTest {
+class HttpTaskServerTest {
     private HttpTaskServer server;
-    private TaskManager manager;
-    private Gson gson;
+    private TaskManager taskManager;
+    private HttpClient client;
+    private final Gson gson = new Gson();
 
     @BeforeEach
     void setUp() throws IOException {
-        manager = Managers.getDefault();
-        server = new HttpTaskServer(manager);
+        taskManager = mock(TaskManager.class);
+        server = new HttpTaskServer(taskManager);
         server.start();
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gson = gsonBuilder.create();
+        client = HttpClient.newHttpClient();
     }
 
     @AfterEach
@@ -46,16 +38,32 @@ public class HttpTaskServerTest {
 
     @Test
     void testAddTask() throws IOException, InterruptedException {
-        Task task = new Task("Test", "Description", Status.NEW);
-        String taskJson = gson.toJson(task);
+        // Подготовка тестовых данных
+        Task testTask = new Task("Test task", "Description", Task.Status.NEW);
+        String taskJson = gson.toJson(testTask);
 
-        HttpClient client = HttpClient.newHttpClient();
+        // Настройка mock-объекта
+        when(taskManager.addTask(any(Task.class))).thenAnswer(invocation -> {
+            Task t = invocation.getArgument(0);
+            t.setId(1); // Устанавливаем ID для имитации сохранения
+            return null;
+        });
+
+        // Отправка запроса
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .header("Content-Type", "application/json")
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
+
+        // Проверки
+        assertEquals(201, response.statusCode(), "Статус код должен быть 201 (Created)");
+        verify(taskManager, times(1)).addTask(any(Task.class));
+
+        // Проверка тела ответа
+        Task responseTask = gson.fromJson(response.body(), Task.class);
+        assertNotNull(responseTask.getId(), "Задача должна иметь ID после сохранения");
     }
 }
