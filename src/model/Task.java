@@ -2,10 +2,8 @@ package model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-public class Task {
-    private static int idCounter = 1;
+public abstract class Task {
     private int id;
     private String title;
     private String description;
@@ -14,24 +12,19 @@ public class Task {
     private Duration duration;
 
     public Task(String title, String description, Status status) {
-        this.id = idCounter++;
         this.title = title;
         this.description = description;
         this.status = status;
     }
 
-    public Task(String title, String description, Status status,
-                LocalDateTime startTime, Duration duration) {
-        this(title, description, status);
+    public Task(String title, String description, Status status, LocalDateTime startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
         this.startTime = startTime;
         this.duration = duration;
     }
 
-    public static void resetIdCounter() {
-        idCounter = 1;
-    }
-
-    // Геттеры и сеттеры
     public int getId() {
         return id;
     }
@@ -45,9 +38,7 @@ public class Task {
     }
 
     public void setTitle(String title) {
-        if (title != null) {
-            this.title = title;
-        }
+        this.title = title;
     }
 
     public String getDescription() {
@@ -55,9 +46,7 @@ public class Task {
     }
 
     public void setDescription(String description) {
-        if (description != null) {
-            this.description = description;
-        }
+        this.description = description;
     }
 
     public Status getStatus() {
@@ -65,9 +54,7 @@ public class Task {
     }
 
     public void setStatus(Status status) {
-        if (status != null) {
-            this.status = status;
-        }
+        this.status = status;
     }
 
     public LocalDateTime getStartTime() {
@@ -87,20 +74,10 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime != null && duration != null ? startTime.plus(duration) : null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
-        Task task = (Task) o;
-        return id == task.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        if (startTime == null || duration == null) {
+            return null;
+        }
+        return startTime.plus(duration);
     }
 
     @Override
@@ -108,6 +85,7 @@ public class Task {
         return "Task{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
                 ", status=" + status +
                 ", startTime=" + startTime +
                 ", duration=" + duration +
