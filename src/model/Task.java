@@ -1,13 +1,17 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
     private static int idCounter = 1;
-    private final int id;
+    private int id;
     private String title;
     private String description;
     private Status status;
+    private LocalDateTime startTime;
+    private Duration duration;
 
     public Task(String title, String description, Status status) {
         this.id = idCounter++;
@@ -16,32 +20,74 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String title, String description, Status status,
+                LocalDateTime startTime, Duration duration) {
+        this(title, description, status);
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public static void resetIdCounter() {
+        idCounter = 1;
+    }
+
+    // Геттеры и сеттеры
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
+    public void setTitle(String title) {
+        if (title != null) {
+            this.title = title;
+        }
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public void setStatus(Status status) {
-        this.status = status;
+        if (status != null) {
+            this.status = status;
+        }
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
     }
 
     @Override
@@ -55,5 +101,16 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", status=" + status +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
+                '}';
     }
 }
