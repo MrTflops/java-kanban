@@ -20,23 +20,26 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpTaskServerTest {
+class HttpTaskServerTest {
+    private static final int PORT = 8080;
     private HttpTaskServer server;
     private TaskManager manager;
     private Gson gson;
+    private HttpClient client;
 
     @BeforeEach
     void setUp() throws IOException {
         manager = Managers.getDefault();
         server = new HttpTaskServer(manager);
         server.start();
+        client = HttpClient.newHttpClient();
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gson = gsonBuilder.create();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
     }
 
     @AfterEach
@@ -45,17 +48,113 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void testAddTask() throws IOException, InterruptedException {
+    void testAddTask_ShouldReturn201Created() throws IOException, InterruptedException {
+        // Arrange
         Task task = new Task("Test", "Description", Status.NEW);
         String taskJson = gson.toJson(task);
 
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/tasks"))
+                .uri(URI.create("http://localhost:" + PORT + "/tasks"))
+                .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .build();
 
+        // Act
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
+
+        // Assert
+        assertAll(
+                () -> assertEquals(201, response.statusCode(),
+                        "При успешном создании задачи должен возвращаться статус 201"),
+                () -> assertEquals(1, manager.getAllTasks().size(),
+                        "В менеджере должна появиться новая задача"),
+                () -> assertTrue(response.body().contains("Test"),
+                        "Ответ должен содержать название созданной задачи")
+        );
+    }
+
+    @Test
+    void testAddTask_WithInvalidData_ShouldReturn400BadRequest() throws IOException, InterruptedException {
+        // Arrange
+        String invalidJson = "{'invalid': 'data'}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + PORT + "/tasks"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(invalidJson))
+                .build();
+
+        // Act
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Assert
+        assertAll(
+                () -> assertEquals(400, response.statusCode(),
+                        "При невалидных данных должен возвращаться статус 400"),
+                () -> assertTrue(response.body().contains("error"),
+                        "Ответ должен содержать сообщение об ошибке"),
+                () -> assertTrue(manager.getAllTasks().isEmpty(),
+                        "При ошибке не должно добавляться задач")
+        );
+    }
+
+    @Test
+    void testGetTasks_ShouldReturn200Ok() throws IOException, InterruptedException {
+        // Arrange
+        Task task = new Task("Test", "Description", Status.NEW);
+        manager.addTask(task);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + PORT + "/tasks"))
+                .GET()
+                .build();
+
+        // Act
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Assert
+        assertAll(
+                () -> assertEquals(200, response.statusCode()),
+                () -> assertTrue(response.body().contains("Test")),
+                () -> assertFalse(response.body().isEmpty())
+        );
+    }
+
+    @Test
+    void testGetTaskById_ShouldReturn200Ok() throws IOException, InterruptedException {
+        // Arrange
+        Task task = new Task("Test", "Description", Status.NEW);
+        manager.addTask(task);
+        int taskId = task.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + PORT + "/tasks/" + taskId))
+                .GET()
+                .build();
+
+        // Act
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Assert
+        assertAll(
+                () -> assertEquals(200, response.statusCode()),
+                () -> assertTrue(response.body().contains("Test")),
+                () -> assertTrue(response.body().contains(String.valueOf(taskId)))
+        );
+    }
+
+    @Test
+    void testGetTaskById_WhenNotExists_ShouldReturn404NotFound() throws IOException, InterruptedException {
+        // Arrange
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + PORT + "/tasks/999"))
+                .GET()
+                .build();
+
+        // Act
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Assert
+        assertEquals(404, response.statusCode());
     }
 }
